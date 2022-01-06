@@ -19,7 +19,12 @@ export class ConnectionManager extends TypedEmitter<ConnectionManagerEvents> {
         super()
         
         this.server = createServer();
-        const io = this.io = new IO(this.server)
+        const io = this.io = new IO(this.server, {
+            cors: {
+              origin: "*",
+              methods: ["GET", "POST"]
+            }
+          })
 
         io.on('connection', async socket => {
             const connection = new Connection(socket)

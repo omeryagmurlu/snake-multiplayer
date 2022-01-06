@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<body>
+    <button id="connect">connect</button>
+    roomname: <input type="text" id="roomname">
+    roomsize: <input type="number" id="roomsize">
+    <button id="newroom">newroom</button>
+    roomid: <input type="text" id="roomid">
+    <button id="joinroom">joinroom</button>
+    plname: <input type="text" id="plname">
+    plcolor: <input type="text" id="plcolor">
+    <button id="register">register</button>
+    <button id="ready">ready</button>
+
+    <pre id="canvas">canvas</pre>
+
+    <script type="module">
+        import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
+        import { Connection } from "./snake-multiplayer-protocol.js"
+
+        function on(id, fn) {
+            document.getElementById(id).onclick = () => fn()
+        }
+        const txt = (id) => document.getElementById(id).value
+        const num = (id) => parseInt(document.getElementById(id).value)
+
+        let socket, connection, roomManagement, room;
+
+        on("connect", async () => {
+            socket = io("http://localhost:3000")
+            socket.on('connect', async () => {
+                console.log('connected')
+            })
+            connection = window.conn = new Connection(socket)
+            roomManagement = connection.createChannel('room-management')
+            console.log(await roomManagement.send("getRoomStates"))
+        })
+
+        on("newroom", async () => {
+            const id = await roomManagement.sendAndWait('newRoom', txt("roomname"), num("roomsize"))
+            console.log(id)
+        })
+
+        on("joinroom", async () => {
+            const succ = await roomManagement.sendAndWait('joinRoom', txt("roomid"))
+            console.log(succ)
+            room = connection.createChannel('room-joined')
+            room.on("state", state => {
+                console.log(state)
+            })
+            room.on("startingIn", state => {
+                console.log(state)
+            })
+
+            room.on("starting", () => {
+                console.log("GAME ON")
+            })
+        })
+
+        on("register", async () => {
+            const succ2 = await room.sendAndWait('register', txt("plname"), txt("plcolor"));
+            console.log(succ2)
+        })
+
+        on("ready", async () => {
+            const succ2 = await room.sendAndWait('ready', true);
+            console.log(succ2)
+        })
+    </script>
+</body>
+</html>

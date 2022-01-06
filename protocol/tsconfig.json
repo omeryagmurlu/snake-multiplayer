@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": ".",
+        "strict": true,
+        "esModuleInterop": true,
+        "target": "ES2019",
+        "moduleResolution": "node",
+    },
+    "include": ["src"],
+    "exclude": ["dist"],
+}

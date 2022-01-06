@@ -1,3 +1,4 @@
+import { trace } from "./utils/Logger";
 import { Connection } from "./Connection";
 import { ConnectionManager } from "./ConnectionManager";
 import { RoomManager } from "./RoomManager";
@@ -15,6 +16,7 @@ export class App {
     }
 
     handleNewConnections = (connection: Connection) => {
+        trace(`new connection: ${connection.getId()}`)
         this.rooms.handleConnection(connection);
     }
 }

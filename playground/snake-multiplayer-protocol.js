@@ -1,0 +1,1 @@
+../protocol/dist/index.browser.esm.js

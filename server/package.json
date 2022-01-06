@@ -19,9 +19,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.2",
     "express": "^4.17.2",
     "randomatic": "^3.1.1",
-    "socket.io": "^4.4.0",
+    "socket.io": "^4.4.1",
     "tiny-typed-emitter": "^2.1.0"
   }
 }

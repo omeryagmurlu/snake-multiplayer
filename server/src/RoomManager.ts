@@ -2,6 +2,7 @@ import { Connection } from "./Connection";
 import { Room } from "./Room";
 import randomatic from 'randomatic';
 import assert from "assert";
+import { trace } from "./utils/Logger";
 
 interface Send {
 }
@@ -25,16 +26,22 @@ export class RoomManager {
 
     handleConnection(connection: Connection) {
         const channel = connection.createChannel<Send, Receive>('room-management');
+        trace(`created channel 'room-management'`);
+        
         channel.on('newRoom', (name, playerCount, callback) => {
+            trace(`'room-management': newRoom(${name}, ${playerCount})`);
             const id = this.createRoom(name, playerCount)
             callback(id);
         })
 
         channel.on('joinRoom', (id, callback) => {
+            trace(`'room-management': joinRoom(${id})`);
             callback(this.joinRoom(id, connection))
         })
 
         channel.on('getRoomStates', (callback) => {
+            trace(`'room-management': getRoomStates()`);
+
             callback(this.rooms.map(x => {
                 const { id, current, max, name, ingame } = x.getProperties()
                 return { id, current, max, name, ingame };
