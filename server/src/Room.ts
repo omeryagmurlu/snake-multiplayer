@@ -1,6 +1,7 @@
 import assert from "assert";
 import { trace } from "./utils/Logger";
 import { Channel, Connection } from "./Connection";
+import { Game } from "./Game";
 
 export interface RoomPlayer {
     connection: Connection,
@@ -80,12 +81,12 @@ export class Room {
             this.updatePlayers()
 
 
-            if (this.isAllReady()) {
+            if (this.readyToStart()) {
                 this.broadcast('startingIn', 3000)
                 this.startTimeout = setTimeout(() => {
-                    if (this.isAllReady()) {
-                        // TODO create game here
+                    if (this.readyToStart()) {
                         this.broadcast('starting')
+                        this.createGame()
                     }
                 }, 3000)
             }
@@ -113,8 +114,8 @@ export class Room {
         })
     }
 
-    isAllReady() {
-        return this.players.reduce((acc, curr) => {
+    readyToStart() {
+        return this.playerCount === this.players.length && this.players.reduce((acc, curr) => {
             return acc && curr.ready;
         }, true)
     }
@@ -138,5 +139,13 @@ export class Room {
 
     updatePlayers() {
         this.broadcast('state', this.getProperties())
+    }
+
+    createGame() {
+        this.inGame = true;
+        this.updatePlayers();
+
+        const game = new Game(this.players.map(({ name, color, connection }) => ({ name, color, connection })));
+        game.start()
     }
 }
