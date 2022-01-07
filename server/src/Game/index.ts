@@ -55,8 +55,8 @@ interface Receive {
 const SIZE: Vector = new Vector(40, 40);
 const PAD: Vector = new Vector(10, 10);
 const INITIAL_SIZE = 2;
-const TIME = 120 * 1000;
-const TICKTIME = 2000;
+const TIME = 240 * 1000;
+const TICKTIME = 750;
 const PELLET_COUNT = 3;
 
 export class Game {

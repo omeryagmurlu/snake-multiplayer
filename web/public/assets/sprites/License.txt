@@ -1,0 +1,7 @@
+sprites are from https://helpfulsheep.com/snake/images
+
+License from: https://helpfulsheep.com/about/ reads (07.01.22):
+Terms of use
+Apart from the Helpful Sheep logo and a few other things, the content is my own work and unless otherwise stated, you are free to use it in any way you wish to. Basically, you are free to redistribute and/or modify anything you can get your hands on and include it in your own work regardless of its commercial or non-commercial nature. I do not require any kind of compensation, but a link back to my website would be greatly appreciated.
+
+May I live to see the day we all do the things we love for a living.
