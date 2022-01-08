@@ -1,9 +1,11 @@
-import { readable } from 'svelte/store';
 import App from './App.svelte';
-import type { Dispathable } from './interfaces/Dispatchable';
+import { populate } from './lib/config';
 
-const app = new App({
-	target: document.body
-});
+// hmm. [!] Error: Module format iife does not support top-level await. Use the "es" or "system" output formats rather.
+(async () => {
+	await populate();
 
-export default app;
+	const app = new App({
+		target: document.body
+	});
+})()

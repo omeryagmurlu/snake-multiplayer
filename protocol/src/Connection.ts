@@ -1,5 +1,8 @@
-import { Socket } from "socket.io";
+import { Socket as ServerSocket } from "socket.io";
+import { Socket as ClientSocket } from "socket.io-client";
 import { TypedEmitter } from "tiny-typed-emitter";
+
+type Socket = ServerSocket | ClientSocket
 
 interface ConnectionEvents {
     disconnect: () => void
