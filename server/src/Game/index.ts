@@ -116,10 +116,12 @@ export class Game {
 
     createPellets() {
         this.pellets = this.pellets ?? []
-        if (this.pellets.length !== PELLET_COUNT) {
-            trace(`pellets: ${this.pellets.length}/${PELLET_COUNT}`)
+        
+        if (this.pellets.length === PELLET_COUNT) {
+            return;
         }
         
+        trace(`pellets: ${this.pellets.length}/${PELLET_COUNT}`)
         const freeLocs = this.getFreePelletLocations()
         shuffleArray(freeLocs)
 
