@@ -1,39 +1,25 @@
 import assert from "assert";
+import { Channel, ChannelArray, Connection } from "protocol";
+import { DetailedRoomState } from "protocol/dist/interfaces/Room";
+import { Channels } from "protocol/dist/interfaces/Channels";
 import { trace } from "./utils/Logger";
-import { Channel, ChannelArray, Connection } from "./Connection";
 import { Game } from "./Game";
 
+type Ch = Channels['room-joined']
+
 export interface RoomPlayer {
-    connection: Connection,
-    channel: Channel<Send, Receive>,
+    connection: Connection<Channels>,
+    channel: Channel<Ch[0], Ch[1]>,
     name: string,
     color: string,
     ready: boolean
 }
 
-interface RoomState {
-    id: string,
-    current: number,
-    name: string,
-    max: number,
-    players: Omit<RoomPlayer, "connection" | "channel">[],
-    ingame: boolean
-}
-
-interface Send {
-    startingIn: (n: number) => void
-    starting: () => void
-    state: (state: RoomState) => void
-}
-interface Receive {
-    register: (pName: string, color: string) => boolean
-    ready: (ready: boolean) => void
-}
-
 export class Room {
     private inGame = false;
     private players: RoomPlayer[] = []
-    private connections = new WeakSet<Connection>()
+    private channels: ChannelArray<Ch[0], Ch[1]> = new ChannelArray()
+    private connections = new WeakSet<Connection<Channels>>()
     private startTimeout: any; // I can't waste time on this shit
 
     constructor(
@@ -42,14 +28,15 @@ export class Room {
         private playerCount: number
     ) {}
 
-    join(connection: Connection): boolean {
+    join(connection: Connection<Channels>): boolean {
         if (this.cantRegister(connection) || this.connections.has(connection)) {
             trace('connection cant join')
             return false;
         }
         this.connections.add(connection)
 
-        const channel = connection.createChannel<Send, Receive>('room-joined')
+        const channel = connection.createChannel<Ch[0], Ch[1]>('room-joined')
+        this.channels.push(channel);
         trace(`created channel 'room-joined', ${this.id}`);
 
         channel.on('register', (pName, color, callback) => {
@@ -62,12 +49,11 @@ export class Room {
             ) {
                 trace('cant register')
                 callback(false);
-                channel.destroy();
                 return
             }
 
             this.addPlayer(pName, color, connection, channel)
-            this.updatePlayers()
+            this.updateAll()
             callback(true)
         })
 
@@ -78,32 +64,55 @@ export class Room {
 
             clearTimeout(this.startTimeout)
             pl.ready = ready
-            this.updatePlayers()
-
+            this.updateAll()
 
             if (this.readyToStart()) {
-                this.allChannels().broadcast('startingIn', 3000)
+                this.playerChannels().broadcast('startingIn', 3000)
                 this.startTimeout = setTimeout(() => {
                     if (this.readyToStart()) {
-                        this.allChannels().broadcast('starting')
+                        this.playerChannels().broadcast('starting')
                         this.createGame()
                     }
                 }, 3000)
             }
         })
+        
+        channel.on('leave', () => {
+            trace(`'room-joined': leave()`);
+            this.leave(connection, channel);
+        })
+
+        channel.onDisconnect(() => {
+            trace(`'room-joined': disconnecting`);
+            this.leave(connection, channel);
+        })
+
+        channel.on('getState', (cb) => {
+            cb(this.getProperties())
+        })
 
         return true;
     }
+
+    leave(connection: Connection<Channels>, channel: Channel<Ch[0], Ch[1]>) {
+            const player = this.players.find(x => x.connection.getId() === connection.getId())
+            this.players = this.players.filter(p => p !== player);
+
+            this.channels.remove(channel)
+            channel.destroy()
+            this.connections.delete(connection)
+            this.updateAll()
+    }
     
-    cantRegister(connection: Connection) {
+    cantRegister(connection: Connection<Channels>) {
         return this.players.length >= this.playerCount || this.inGame || !!this.players.find(x => x.connection.getId() === connection.getId());
     }
 
-    getRegistered(connection: Connection) {
+    getRegistered(connection: Connection<Channels>) {
         return this.players.find(x => x.connection.getId() === connection.getId());
     }
 
-    addPlayer(pName: string, color: string, connection: Connection, channel: Channel<Send, Receive>) {
+    addPlayer(pName: string, color: string, connection: Connection<Channels>, channel: Channel<Ch[0], Ch[1]>) {
         trace(`adding player ${pName}`);
         this.players.push({
             connection,
@@ -120,7 +129,7 @@ export class Room {
         }, true)
     }
 
-    getProperties(): RoomState {
+    getProperties(): DetailedRoomState {
         return {
             id: this.id,
             current: this.players.length,
@@ -131,19 +140,23 @@ export class Room {
         }
     }
 
-    updatePlayers() {
+    updateAll() {
         this.allChannels().broadcast('state', this.getProperties())
     }
 
+    playerChannels() {
+        return new ChannelArray<Ch[0], Ch[1]>(...this.players.map(x => x.channel))
+    }
+
     allChannels() {
-        return new ChannelArray<Send, Receive>(...this.players.map(x => x.channel))
+        return this.channels
     }
 
     createGame() {
         this.inGame = true;
-        this.updatePlayers();
+        this.updateAll();
 
         const game = new Game(this.players.map(({ name, color, connection }) => ({ name, color, connection })));
-        game.start()
+        game.start() // with game.onEnd etc setup the room again after a play TODO maybe? 
     }
 }

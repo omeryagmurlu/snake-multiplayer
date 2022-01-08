@@ -1,17 +1,13 @@
+import { Direction } from "protocol/dist/interfaces/Game";
+import { Vector, Pixel } from "protocol/dist/classes/Game";
+
 import { trace } from "../../utils/Logger";
-import { nFarthest, Pixel, shuffleArray, Vector } from "../GameUtils";
+import { nFarthest, shuffleArray } from "../GameUtils";
 import { Collidable, collidableToCollidable, pointToCollidable } from "./Collidable";
 import { GrowingMoveable, Movement } from "./Movement";
 
 export * from './Collidable'
 export * from './Movement'
-
-export enum Direction {
-    Up = "UP",
-    Down = "DOWN",
-    Left = "LEFT",
-    Right = "RIGHT",
-}
 
 export class PlayerPhysics implements Collidable, GrowingMoveable {
     private previousDirection: Direction;

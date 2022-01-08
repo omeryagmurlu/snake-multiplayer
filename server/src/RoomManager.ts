@@ -1,59 +1,63 @@
-import { Connection } from "./Connection";
 import { Room } from "./Room";
 import randomatic from 'randomatic';
 import assert from "assert";
 import { trace } from "./utils/Logger";
+import { ChannelArray, Connection } from "protocol";
+import { RoomState } from "protocol/dist/interfaces/RoomManagement";
+import { Channels } from "protocol/dist/interfaces/Channels";
 
-interface Send {
-}
-interface Receive {
-    newRoom: (roomName: string, playerCount: number, callback: (id: string) => void) => void,
-    joinRoom: (id: string, callback: (success: boolean) => void) => void,
-    getRoomStates: (callback: (response: RoomState[]) => void) => void,
-    // isNameAvailable: (name: string, callback: (state: boolean) => void)
-}
-
-interface RoomState {
-    current: number,
-    max: number,
-    name: string,
-    id: string
-}
+type Ch = Channels['room-management']
 
 export class RoomManager {
+    private channels = new ChannelArray<Ch[0], Ch[1]>()
     private rooms: Room[] = []
     private roomIds: Set<string> = new Set();
 
-    handleConnection(connection: Connection) {
-        const channel = connection.createChannel<Send, Receive>('room-management');
+    handleConnection(connection: Connection<Channels>) {
+        const channel = connection.createChannel<Ch[0], Ch[1]>('room-management');
+        this.channels.push(channel);
         trace(`created channel 'room-management'`);
         
         channel.on('newRoom', (name, playerCount, callback) => {
             trace(`'room-management': newRoom(${name}, ${playerCount})`);
             const id = this.createRoom(name, playerCount)
             callback(id);
+            this.updateClients()
         })
 
         channel.on('joinRoom', (id, callback) => {
             trace(`'room-management': joinRoom(${id})`);
             callback(this.joinRoom(id, connection))
+            this.updateClients()
         })
 
         channel.on('getRoomStates', (callback) => {
             trace(`'room-management': getRoomStates()`);
 
-            callback(this.rooms.map(x => {
-                const { id, current, max, name, ingame } = x.getProperties()
-                return { id, current, max, name, ingame };
-            }).filter(x => {
-                if (x.current >= x.max) return 0;
-                if (x.ingame) return 0;
-                return 1;
-            }))
+            callback(this.getRoomStates())
+        })
+
+        channel.onDisconnect(() => {
+            this.channels.remove(channel);
         })
     }
 
-    joinRoom(id: string, connection: Connection): boolean {
+    getRoomStates(): RoomState[] {
+        return this.rooms.map(x => {
+            const { id, current, max, name, ingame } = x.getProperties()
+            return { id, current, max, name, ingame };
+        }).filter(x => {
+            if (x.current >= x.max) return 0;
+            if (x.ingame) return 0;
+            return 1;
+        })
+    }
+
+    updateClients() {
+        this.channels.broadcast('state', this.getRoomStates())
+    }
+
+    joinRoom(id: string, connection: Connection<Channels>): boolean {
         if (!this.roomIds.has(id)) return false;
 
         const room = this.rooms.find(x => x.getProperties().id === id);

@@ -1,5 +1,5 @@
-import { Direction } from ".";
-import { Pixel, Vector } from "../GameUtils";
+import { Pixel, Vector } from "protocol/dist/classes/Game"
+import { Direction } from "protocol/dist/interfaces/Game"
 
 export interface GrowingMoveable {
     setDirection(dir: Direction): void,

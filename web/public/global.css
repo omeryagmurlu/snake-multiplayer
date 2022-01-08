@@ -5,7 +5,7 @@
     src: url(assets/TerminalVector.ttf);
 }
 
-/* body:before {
+body:before {
 	content: " ";
 	display: block;
 	position: absolute;
@@ -15,9 +15,9 @@
 	right: 0;
 	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
 	z-index: 2;
-	background-size: 100% 4px, 6px 100%;
+	background-size: 100% 2px, 4px 100%;
 	pointer-events: none;
-} */
+}
 
 /* endfrom */
 
@@ -26,6 +26,7 @@
 *::before,
 *::after {
 	box-sizing: border-box;
+	user-select: none;
 }
 
 html, body {
@@ -33,17 +34,6 @@ html, body {
 	width: 100%;
 	height: 100%;
 	padding: 0;
-}
-
-body {
-	/* neave */
-	/* background-color: #9c9; */
-
-	/* dunno */
-	/* background-color: #9bba5a; */
-	
-	/* from the stripey one */
-	/* background-color: #9bbc0f; */
 }
 
 input, button, select, textarea {
@@ -68,4 +58,94 @@ blockquote,
 dl,
 dd {
   margin: 0;
+}
+
+a {
+	color: inherit;
+	text-decoration: inherit;
+}
+
+/* hide arrows */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* End Reset */
+
+:root {
+	--bg-color: #000;
+	--accent-color: #9bbc0f;
+	--accent-color-dark: #748d0b;
+	/* neave */
+	/* background-color: #9c9; */
+	
+	/* dunno */
+	/* background-color: #9bba5a; */
+	
+	/* from the stripey one */
+	/* background-color: #9bbc0f; */
+	--min-sq-w: 200px;
+	--min-sq-h: 150px;
+}
+
+body, html {
+	height: 100%;
+	font-family: 'terminalvector', monospace;
+	font-size: 18px;
+
+	color: var(--accent-color);
+
+	line-height: 1.25;
+}
+
+h1 {
+	font-size: 2.25em;
+}
+
+h2 {
+	font-size: 1.5em;
+}
+
+h3 {
+	font-size: 1.3em;
+}
+
+h4 {
+	font-size: 1em;
+}
+
+body {
+	background-color: var(--bg-color);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+button {
+	background-color: var(--accent-color);
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+}
+
+a {
+	text-decoration: underline;
+}
+
+input[type=text], input[type=number] {
+	background-color : inherit;
+	border: none;
+	outline: none;
+	color: inherit;
+	border-bottom: 1px solid var(--accent-color);
+	padding: 0;
+	margin: 0;
 }

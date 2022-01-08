@@ -1,21 +1,4 @@
-export class Vector {
-    constructor(
-        public x: number,
-        public y: number
-    ) {}
-
-    equals(l2: Vector): boolean {
-        return this.x === l2.x && this.y === l2.y;
-    }
-}
-
-export class Pixel extends Vector {
-    constructor(x: number, y: number,
-        public wasPellet?: boolean
-    ) {
-        super(x, y);
-    }
-}
+import { Vector } from "protocol/dist/classes/Game";
 
 export function shuffleArray<T>(array: T[]) { // in place
     for (let i = array.length - 1; i > 0; i--) {

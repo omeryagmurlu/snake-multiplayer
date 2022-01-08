@@ -8,7 +8,11 @@ interface ConnectionEvents {
     disconnect: () => void
 }
 
-export class Connection extends TypedEmitter<ConnectionEvents> {
+type ChannelListSignature<L extends Record<string, [any, any]>> = {
+    [E in keyof L]: [SenderSignature<L[E][0]>, ReceiverSignature<L[E][1]>]
+}
+
+export class Connection<Channels extends ChannelListSignature<Channels>> extends TypedEmitter<ConnectionEvents> {
     constructor(
         private socket: Socket
     ) {
@@ -28,8 +32,11 @@ export class Connection extends TypedEmitter<ConnectionEvents> {
         return true;
     }
 
-    createChannel<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>>(name: string): Channel<Send, Receive> {
-        return new Channel<Send, Receive>(name, this.socket);
+    // this is not ideal (keyof Channels not checking whether send and receive belong to them) but this is the cost isomorphic TS
+    // this is correct but too verbose: (see: https://github.com/microsoft/TypeScript/issues/10571)
+    // createChannel<Send extends Channels[K][0] | Channels[K][1], Receive extends Channels[K][0] | Channels[K][1], K extends keyof Channels>(name: K): Channel<Send, Receive> {
+    createChannel<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>>(name: keyof Channels): Channel<Send, Receive> {
+        return new Channel<Send, Receive>(name as string, this.socket);
     }
 }
 // params are what we receive, return is what we send back (ack) (only via callback),
@@ -48,6 +55,7 @@ type Helper<L extends ReceiverSignature<L>> = {
 
 export class Channel<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>> extends TypedEmitter<Helper<Receive>> {
     private globalAck: number
+    private disFn: () => void = () => {}
 
     constructor(
         private name: string,
@@ -58,24 +66,30 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
         this.globalAck = Math.floor(Math.random() * 1000000) + 1 // don't start acks from the beginning; don't use 0 as ack since it has special meaning
 
         // K is message name (key), Receive[K] params are what we receive, Receive[K] return is what we send back (only via callback)
-        this.socket.on(this.name, <K extends keyof Receive>(json: string, callback: (response: ReturnType<Receive[K]>) => void) => {
-            // currently not using ack numbers, but they are still in the makeshift protocol (may swap socket.io with something else later)
-            const {
-                name, data, ack = 0
-            } = JSON.parse(json) as {
-                name: K, data: Parameters<Receive[K]>, ack?: number
-            };
-
-            let tmp = [...data, (response: ReturnType<Receive[K]>) => {
-                if (ack !== 0) {
-                    callback(response)
-                }
-                // else, nop
-            }] as Parameters<Helper<Receive>[K]>
-
-            const retData = tmp;
-            this.emit(name, ...retData);
+        this.socket.on(this.name, this.onSocket)
+        this.socket.on('disconnect', () => {
+            this.disFn()
+            this.destroy()
         })
+    }
+
+    private onSocket = <K extends keyof Receive>(json: string, callback: (response: ReturnType<Receive[K]>) => void) => {
+        // currently not using ack numbers, but they are still in the makeshift protocol (may swap socket.io with something else later)
+        const {
+            name, data, ack = 0
+        } = JSON.parse(json) as {
+            name: K, data: Parameters<Receive[K]>, ack?: number
+        };
+
+        let tmp = [...data, (response: ReturnType<Receive[K]>) => {
+            if (ack !== 0) {
+                callback(response)
+            }
+            // else, nop
+        }] as Parameters<Helper<Receive>[K]>
+
+        const retData = tmp;
+        this.emit(name, ...retData);
     }
 
     async send<K extends keyof Send>(name: K, ...data: Parameters<Send[K]>): Promise<ReturnType<Send[K]>> {
@@ -93,9 +107,14 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
     }
 
     destroy() {
-        this.socket.removeAllListeners(this.name)
+        if (!this.socket) return;
+        this.socket.removeListener(this.name, this.onSocket)
         this.socket = undefined as unknown as Socket; // wtf? why
         this.send = (): Promise<any> => { throw new Error("this shouldn't have come here, channel is already closed") }
+    }
+
+    onDisconnect(fn = () => {}) {
+        this.disFn = fn
     }
 }
 
@@ -103,6 +122,13 @@ export class ChannelArray<Send extends SenderSignature<Send>, Receive extends Re
     broadcast<K extends keyof Send>(name: K, ...data: Parameters<Send[K]>) {
         for (const ch of this) {
             ch.send(name, ...data);
+        }
+    }
+
+    remove(channel: Channel<Send, Receive>) {
+        const index = this.indexOf(channel);
+        if (index !== -1) {
+            this.splice(index, 1);
         }
     }
 }

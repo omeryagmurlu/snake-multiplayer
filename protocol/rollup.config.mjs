@@ -1,9 +1,13 @@
 // rollup.config.js
-import pkg from './package.json'
+import { globbySync as globby } from 'globby';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+
+import { readFileSync } from 'fs';
+
+const pkg = JSON.parse(readFileSync('./package.json'))
 
 export default [
     // browser-friendly builds
@@ -43,5 +47,18 @@ export default [
             nodeResolve(),
             commonjs(), // so Rollup can convert to ES module
         ]
-    }
+    },
+
+    ...globby(['src/interfaces/*.ts', 'src/classes/*.ts']).map(path => ({
+        input: path,
+        output: [
+            { file: path.replace('src', 'dist').replace('.ts', '.js'), format: 'cjs' },
+            { file: path.replace('src', 'dist').replace('.ts', '.esm.js'), format: 'es' }
+        ],
+        plugins: [
+            typescript(),
+            nodeResolve(),
+            commonjs(), // so Rollup can convert to ES module
+        ]
+    }))
 ];

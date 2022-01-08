@@ -9,12 +9,14 @@ import { Link } from "svelte-routing";
 
 <section>
     {#if backTo}
+    <nav>
         <Link to={backTo}>
             BACK
         </Link>
+    </nav>
     {/if}
     {#if title}
-        <header>{title}</header>
+        <h1>{title}</h1>
     {/if}
     <article>
         <slot></slot>
@@ -24,3 +26,13 @@ import { Link } from "svelte-routing";
         </svelte:component>
     {/if}
 </section>
+
+<style>
+    section {
+        /* border: solid 1px red; */
+    }
+
+    nav {
+        color: var(--accent-color-dark);
+    }
+</style>

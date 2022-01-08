@@ -1,11 +1,17 @@
 import assert from "assert";
-import { Channel, Connection, ChannelArray } from "../Connection";
+import { Connection, ChannelArray } from "protocol";
+import { PelletType, Direction } from "protocol/dist/interfaces/Game";
+import { Vector } from "protocol/dist/classes/Game";
+import { Channels } from "protocol/dist/interfaces/Channels";
+
 import { trace } from "../utils/Logger";
-import { Vector, Pixel, getRandomInt, shuffleArray } from "./GameUtils";
-import { Collidable, Direction, getCollision, PlayerPhysics, VectorPhysics, WallPhysics } from "./Physics";
+import { shuffleArray } from "./GameUtils";
+import { Collidable, getCollision, PlayerPhysics, VectorPhysics, WallPhysics } from "./Physics";
+
+type Ch = Channels['game']
 
 export interface Player {
-    connection: Connection,
+    connection: Connection<Channels>,
     name: string,
     color: string,
 }
@@ -17,50 +23,20 @@ export interface IngamePlayer {
     dueGrowth: number
 }
 
-type PelletType = { color: string, growth: number, score: number }
-
 export interface Pellet {
     type: PelletType,
     physics: VectorPhysics
 }
 
-interface GameConfiguration {
-    size: Vector,
-    players: Omit<Player & IngamePlayer, "connection" | "physics">[]
-    ended: boolean,
-    startTime: number,
-    totalTime: number,
-    solid: Vector[]
-}
-
-interface BoardConfiguration {
-    pellets: {
-        type: PelletType,
-        vector: Vector
-    }[],
-    players: {
-        name: string,
-        vectors: Pixel[]
-    }[]
-}
-
-interface Send {
-    "configure-game": (conf: GameConfiguration) => void,
-    "tick": (conf: BoardConfiguration) => void
-}
-interface Receive {
-    input: (direction: Direction) => void
-}
-
-const SIZE: Vector = new Vector(40, 40);
-const PAD: Vector = new Vector(10, 10);
+const SIZE = new Vector(40, 40);
+const PAD = new Vector(10, 10);
 const INITIAL_SIZE = 2;
 const TIME = 240 * 1000;
 const TICKTIME = 750;
 const PELLET_COUNT = 3;
 
 export class Game {
-    private channels: ChannelArray<Send, Receive>;
+    private channels: ChannelArray<Ch[0], Ch[1]>;
 
     private ingame!: Record<string, IngamePlayer>;
     private pellets!: Pellet[];
@@ -77,7 +53,8 @@ export class Game {
 
         this.channels = new ChannelArray();
         for (const pl of this.players) {
-            const channel = pl.connection.createChannel<Send, Receive>("game")
+            const channel = pl.connection.createChannel<Ch[0], Ch[1]>("game")
+            trace('game: creating channel')
             this.channels.push(channel)
             
             channel.on("input", this.handleInput(pl))

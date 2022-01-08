@@ -1,5 +1,5 @@
+import { Vector } from "protocol/dist/classes/Game";
 import { Player } from "..";
-import { Pixel, Vector } from "../GameUtils";
 
 export const pointToCollidable = (v: Vector, c: Collidable): boolean => {
     for (const v2 of c.getCollidableVectors()) {

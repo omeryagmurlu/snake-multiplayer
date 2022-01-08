@@ -2,16 +2,17 @@ import { createServer, Server as HTTPServer } from 'http';
 import { Server as IO } from 'socket.io';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
-import { Connection } from './Connection';
+import { Connection } from 'protocol';
+import { trace } from './utils/Logger';
 
-interface ConnectionManagerEvents {
-    connect: (connection: Connection) => void
+interface ConnectionManagerEvents<T extends Record<string, [any, any]>> {
+    connect: (connection: Connection<T>) => void
 }
 
 const PORT = 3000
 
-export class ConnectionManager extends TypedEmitter<ConnectionManagerEvents> {
-    private connectedList: Connection[] = []
+export class ConnectionManager<T extends Record<string, [any, any]>> extends TypedEmitter<ConnectionManagerEvents<T>> {
+    private connectedList: Connection<T>[] = []
     private server: HTTPServer
     private io: IO;
 
@@ -37,6 +38,7 @@ export class ConnectionManager extends TypedEmitter<ConnectionManagerEvents> {
     }
 
     listen() {
+        trace('LISTENING: ' + PORT)
         this.server.listen(PORT)
     }
 }
