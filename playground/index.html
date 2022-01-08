@@ -102,12 +102,12 @@
         })
 
         on("newroom", async () => {
-            const id = await roomManagement.sendAndWait('newRoom', txt("roomname"), num("roomsize"))
+            const id = await roomManagement.send('newRoom', txt("roomname"), num("roomsize"))
             console.log(id)
         })
 
         on("joinroom", async () => {
-            const succ = await roomManagement.sendAndWait('joinRoom', txt("roomid"))
+            const succ = await roomManagement.send('joinRoom', txt("roomid"))
             console.log(succ)
             room = connection.createChannel('room-joined')
             room.on("state", state => {
@@ -123,12 +123,12 @@
         })
 
         on("register", async () => {
-            const succ2 = await room.sendAndWait('register', txt("plname"), txt("plcolor"));
+            const succ2 = await room.send('register', txt("plname"), txt("plcolor"));
             console.log(succ2)
         })
 
         on("ready", async () => {
-            const succ2 = await room.sendAndWait('ready', true);
+            const succ2 = await room.send('ready', true);
             console.log(succ2)
         })
     </script>

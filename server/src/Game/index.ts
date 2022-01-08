@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Channel, Connection } from "../Connection";
+import { Channel, Connection, ChannelArray } from "../Connection";
 import { trace } from "../utils/Logger";
 import { Vector, Pixel, getRandomInt, shuffleArray } from "./GameUtils";
 import { Collidable, Direction, getCollision, PlayerPhysics, VectorPhysics, WallPhysics } from "./Physics";
@@ -45,8 +45,8 @@ interface BoardConfiguration {
 }
 
 interface Send {
-    "configure-game": [GameConfiguration]
-    "tick": [BoardConfiguration]
+    "configure-game": (conf: GameConfiguration) => void,
+    "tick": (conf: BoardConfiguration) => void
 }
 interface Receive {
     input: (direction: Direction) => void
@@ -60,7 +60,7 @@ const TICKTIME = 750;
 const PELLET_COUNT = 3;
 
 export class Game {
-    private channels: Channel<Send, Receive>[];
+    private channels: ChannelArray<Send, Receive>;
 
     private ingame!: Record<string, IngamePlayer>;
     private pellets!: Pellet[];
@@ -75,7 +75,7 @@ export class Game {
     ) {
         this.init();
 
-        this.channels = []
+        this.channels = new ChannelArray();
         for (const pl of this.players) {
             const channel = pl.connection.createChannel<Send, Receive>("game")
             this.channels.push(channel)
@@ -161,12 +161,6 @@ export class Game {
         return result;
     }
     
-    broadcast<K extends keyof Send>(name: K, ...data: Send[K]) {
-        for (const c of this.channels) {
-            c.send(name, ...data);
-        }
-    }
-    
     start() {
         this.ended = false;
         this.startTime = Date.now();
@@ -176,7 +170,7 @@ export class Game {
     }
 
     sendGameConfiguration() {
-        this.broadcast('configure-game', {
+        this.channels.broadcast('configure-game', {
             size: SIZE,
             ended: this.ended,
             startTime: this.startTime,
@@ -192,7 +186,7 @@ export class Game {
     }
 
     sendBoardConfiguration() {
-        this.broadcast('tick', {
+        this.channels.broadcast('tick', {
             pellets: this.pellets.map(({ type, physics }) => ({
                 type,
                 vector: physics.getCollidableVectors()[0]

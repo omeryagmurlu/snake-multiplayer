@@ -1,6 +1,6 @@
 import assert from "assert";
 import { trace } from "./utils/Logger";
-import { Channel, Connection } from "./Connection";
+import { Channel, ChannelArray, Connection } from "./Connection";
 import { Game } from "./Game";
 
 export interface RoomPlayer {
@@ -21,12 +21,12 @@ interface RoomState {
 }
 
 interface Send {
-    startingIn: [number]
-    starting: []
-    state: [RoomState]
+    startingIn: (n: number) => void
+    starting: () => void
+    state: (state: RoomState) => void
 }
 interface Receive {
-    register: (pName: string, color: string, callback: (success: boolean) => void) => void
+    register: (pName: string, color: string) => boolean
     ready: (ready: boolean) => void
 }
 
@@ -82,10 +82,10 @@ export class Room {
 
 
             if (this.readyToStart()) {
-                this.broadcast('startingIn', 3000)
+                this.allChannels().broadcast('startingIn', 3000)
                 this.startTimeout = setTimeout(() => {
                     if (this.readyToStart()) {
-                        this.broadcast('starting')
+                        this.allChannels().broadcast('starting')
                         this.createGame()
                     }
                 }, 3000)
@@ -131,14 +131,12 @@ export class Room {
         }
     }
 
-    broadcast<K extends keyof Send>(name: K, ...data: Send[K]) {
-        for (const pl of this.players) {
-            pl.channel.send(name, ...data);
-        }
+    updatePlayers() {
+        this.allChannels().broadcast('state', this.getProperties())
     }
 
-    updatePlayers() {
-        this.broadcast('state', this.getProperties())
+    allChannels() {
+        return new ChannelArray<Send, Receive>(...this.players.map(x => x.channel))
     }
 
     createGame() {
