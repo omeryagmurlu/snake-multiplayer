@@ -20,7 +20,7 @@ export const createTick = (
         i = i + 1// % BLOCK_SIZE_IN_PIXEL * gameConfig.size.x // both same rn
 
         ctx.restore()
-        ctx.clearRect(0, 0, 2000, 2000);
+        ctx.clearRect(0, 0, 2000, 2000); //
         ctx.save()
         // ctx.translate(-300, -300)
         ctx.translate(-i, -i)
