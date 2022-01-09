@@ -1,7 +1,7 @@
 import type { GameConfiguration } from "protocol/dist/interfaces/Game";
 
 export const BLOCK_SIZE_IN_PIXEL = 20;
-let i = 0
+let j = 0
 
 export const createTick = (
     canvas: HTMLCanvasElement, gameConfig: GameConfiguration, innerWidth: number, innerHeight: number
@@ -15,15 +15,23 @@ export const createTick = (
 
     const curW = Math.min(innerWidth, BLOCK_SIZE_IN_PIXEL * gameConfig.size.x)
     const curH = Math.min(innerHeight, BLOCK_SIZE_IN_PIXEL * gameConfig.size.y)
+    let camY = curH / 2, camX = curH / 2
 
     return () => {
-        i = i + 1// % BLOCK_SIZE_IN_PIXEL * gameConfig.size.x // both same rn
+        j++
+        const i = j % curH
 
         ctx.restore()
-        ctx.clearRect(0, 0, 2000, 2000); //
+        ctx.clearRect(0, 0, 2000, 2000);
         ctx.save()
-        // ctx.translate(-300, -300)
-        ctx.translate(-i, -i)
+        ctx.translate(camX, camY)
+        if (Math.abs(i - -(camX - curH / 2)) > 100) {
+            camX = -i + curH / 2;
+            camY = -i + curH / 2;
+        }
+
+        ctx.fillStyle = 'rgb(255, 255, 255)';
+        ctx.fillRect(i, i, 5, 5);
 
         ctx.fillStyle = 'rgb(200, 0, 0)';
         ctx.fillRect(10, 10, 50, 50);
