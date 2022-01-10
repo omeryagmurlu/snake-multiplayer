@@ -39,7 +39,7 @@
     let innerWidth: number;
 
     let tick: () => void;
-    $: if (gameConfig && canvas) {
+    $: if (gameConfig && canvas && innerWidth && innerHeight) {
         tick = createTick(canvas, gameConfig, innerWidth, innerHeight)
     } else {
         tick = () => {}
