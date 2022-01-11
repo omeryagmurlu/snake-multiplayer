@@ -67,10 +67,7 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
 
         // K is message name (key), Receive[K] params are what we receive, Receive[K] return is what we send back (only via callback)
         this.socket.on(this.name, this.onSocket)
-        this.socket.on('disconnect', () => {
-            this.disFn()
-            this.destroy()
-        })
+        this.socket.on('disconnect', this.onSocketDisconnect)
     }
 
     private onSocket = <K extends keyof Receive>(json: string, callback: (response: ReturnType<Receive[K]>) => void) => {
@@ -92,6 +89,11 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
         this.emit(name, ...retData);
     }
 
+    private onSocketDisconnect = () => {
+        this.disFn()
+        this.destroy()
+    }
+
     async send<K extends keyof Send>(name: K, ...data: Parameters<Send[K]>): Promise<ReturnType<Send[K]>> {
         return new Promise((res, rej) => {
             const ack = this.globalAck++;
@@ -109,6 +111,7 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
     destroy() {
         if (!this.socket) return;
         this.socket.removeListener(this.name, this.onSocket)
+        this.socket.removeListener('disconnect', this.onSocketDisconnect)
         this.socket = undefined as unknown as Socket; // wtf? why
         this.send = (): Promise<any> => { throw new Error("this shouldn't have come here, channel is already closed") }
     }

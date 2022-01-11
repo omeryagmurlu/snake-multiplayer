@@ -34,7 +34,6 @@
     onMount(async () => {
         const roomManagement = connection.createChannel<ChM[1], ChM[0]>('room-management')
 
-        
         const success = await roomManagement.send('joinRoom', code)
         if (!success) window.history.back() // TODO, maybe error etc
         

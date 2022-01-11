@@ -1,5 +1,6 @@
 # Bugfix
 - server/Room@ready should noop if inGame
+- server/Game overall needs leave mechanisms
 
 # Definitely
 - refactor server/Game to make use of ChannelManager
