@@ -1,10 +1,12 @@
 import assert from "assert";
 import { Channel, ChannelArray, Connection } from "protocol";
 import { DetailedRoomState, PlayerRegistration } from "protocol/dist/interfaces/Room";
+import { Vector } from "protocol/dist/interfaces/Game";
 import { Channels } from "protocol/dist/interfaces/Channels";
 import { trace } from "./utils/Logger";
 import { Game } from "./Game";
 import { ChannelManager } from "./utils/ChannelManager";
+import { RoomRegistration } from "protocol/dist/interfaces/RoomManagement";
 
 type Ch = Channels['room-joined']
 
@@ -22,12 +24,17 @@ export class Room {
     private inGame = false;
     private players: RoomPlayer[] = []
     private startTimeout: any; // I can't waste time on this shit
+    private name: string;
+    private playerCount: number;
+    private size: Vector;
 
     constructor(
         private id: string,
-        private name: string,
-        private playerCount: number
+        registration: RoomRegistration
     ) {
+        this.name = registration.name;
+        this.playerCount = registration.count;
+        this.size = registration.size;
         this.chanman.on('left', channel => {
             const player = this.players.find(x => x.channel === channel)
             this.players = this.players.filter(p => p !== player);
@@ -145,7 +152,7 @@ export class Room {
         this.inGame = true;
         this.updateAll();
 
-        const game = new Game(this.players.map(({ name, color, connection }) => ({ name, color, connection })));
+        const game = new Game(this.players.map(({ name, color, connection }) => ({ name, color, connection })), this.size);
         game.start() // with game.onEnd etc setup the room again after a play TODO maybe? 
     }
 }

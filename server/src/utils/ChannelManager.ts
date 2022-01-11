@@ -28,7 +28,7 @@ export class ChannelManager<Send extends SenderSignature<Send>, Receive extends 
 
     public remove(channel: Channel<Send, Receive>) {
         this.channels.remove(channel);
-        channel.destroy(); // need to test this first
+        channel.destroy();
         this.emit('left', channel)
     }
 }

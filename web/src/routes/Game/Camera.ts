@@ -21,7 +21,7 @@ export class Camera {
     init() {
         this.context.setTransform(1, 0, 0, 1, 0, 0)
         this.context.clearRect(0, 0, this.size.x, this.size.y)
-        this.context.translate(-this.cam.x + this.size.x / 2, -this.cam.y + this.size.y / 2)
+        this.context.translate(Math.round(-this.cam.x + this.size.x / 2), Math.round(-this.cam.y + this.size.y / 2))
     }
 
     cameraToContext(v: IVector) {

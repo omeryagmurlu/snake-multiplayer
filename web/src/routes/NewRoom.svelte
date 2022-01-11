@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Channel, Connection } from "protocol";
+    import { Vector } from "protocol/dist/classes/Game";
     import type { Channels } from "protocol/dist/interfaces/Channels";
     import { onMount } from "svelte";
     import { navigate } from "svelte-routing";
@@ -13,11 +14,11 @@
 
     let name: string;
     let count: number;
-    // let sizeW: number;
-    // let sizeH: number;
+    let sizeW: number = 40;
+    let sizeH: number = 40;
 
     const create = async () => {
-        const id = await roomManagement.send('newRoom', name, count) // sizeW and sizeH njot in use (yet?)
+        const id = await roomManagement.send('newRoom', { name, count, size: new Vector(sizeW, sizeH) }) // sizeW and sizeH njot in use (yet?)
 
         if (!id) return;
         navigate(`/room/${id}`)
@@ -37,13 +38,13 @@
         <div>player count: </div>
         <input type="number" bind:value={count} min="2" style="width: 50px;"/>
     </nav>
-    <!-- <nav>
+    <nav>
         <div>canvas size: </div>
         <div>
             <input type="number" bind:value={sizeW} min="0" style="width: 50px;"/>px
              to <input type="number" bind:value={sizeH} min="0" style="width: 50px;"/>px
         </div>
-    </nav> -->
+    </nav>
     <button disabled={!(name && count)} on:click={create}>create</button>
 </Window>
 

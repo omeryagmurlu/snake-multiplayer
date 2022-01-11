@@ -1,4 +1,5 @@
 import { Vector } from "protocol/dist/classes/Game";
+import { Vector as IVector } from "protocol/dist/interfaces/Game";
 
 export function shuffleArray<T>(array: T[]) { // in place
     for (let i = array.length - 1; i > 0; i--) {
@@ -14,7 +15,7 @@ export function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export const nFarthest = (n: number, size: Vector, pad: Vector): Vector[] => {
+export const nFarthest = (n: number, size: IVector, pad: Vector): Vector[] => {
     const distance = (l: Vector, l2: Vector) => Math.abs(l.x - l2.x) + Math.abs(l.y - l2.y) // manhattan
 
     const paddedSize = new Vector(size.x - 2 * pad.x, size.y - 2 * pad.y)

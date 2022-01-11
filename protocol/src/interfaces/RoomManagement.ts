@@ -1,11 +1,19 @@
+import { Vector } from "./Game";
+
 export interface ServerSend {
     state: (state: RoomState[]) => void
 }
 
 export interface ClientSend {
-    newRoom: (name: string, playersCount: number) => string | undefined,
+    newRoom: (registration: RoomRegistration) => string | undefined,
     joinRoom: (id: string) => boolean,
     getRoomStates: () => RoomState[],
+}
+
+export interface RoomRegistration {
+    name: string,
+    count: number,
+    size: Vector
 }
 
 export interface RoomState {

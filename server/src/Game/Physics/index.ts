@@ -1,4 +1,4 @@
-import { Direction } from "protocol/dist/interfaces/Game";
+import { Direction, Vector as IVector } from "protocol/dist/interfaces/Game";
 import { Vector, Pixel } from "protocol/dist/classes/Game";
 
 import { trace } from "../../utils/Logger";
@@ -52,7 +52,7 @@ export class PlayerPhysics implements Collidable, GrowingMoveable {
         this.locations.unshift(nexthead)
     }
         
-    static getNRandomInitial(n: number, fieldSize: Vector, fieldPadding: Vector, initialSize: number): PlayerPhysics[] {
+    static getNRandomInitial(n: number, fieldSize: IVector, fieldPadding: Vector, initialSize: number): PlayerPhysics[] {
         const starting = nFarthest(n, fieldSize, fieldPadding)
         shuffleArray(starting)
         

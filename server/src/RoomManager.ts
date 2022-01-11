@@ -3,7 +3,7 @@ import randomatic from 'randomatic';
 import assert from "assert";
 import { trace } from "./utils/Logger";
 import { Connection } from "protocol";
-import { RoomState } from "protocol/dist/interfaces/RoomManagement";
+import { RoomRegistration, RoomState } from "protocol/dist/interfaces/RoomManagement";
 import { Channels } from "protocol/dist/interfaces/Channels";
 import { ChannelManager } from "./utils/ChannelManager";
 
@@ -18,9 +18,9 @@ export class RoomManager {
         const channel = this.chanman.manage(connection.createChannel('room-management'));
         trace(`created channel 'room-management'`);
         
-        channel.on('newRoom', (name, playerCount, callback) => {
-            trace(`'room-management': newRoom(${name}, ${playerCount})`);
-            const id = this.createRoom(name, playerCount)
+        channel.on('newRoom', (registration, callback) => {
+            trace(`'room-management': newRoom(`, registration);
+            const id = this.createRoom(registration)
             callback(id);
             this.updateClients()
         })
@@ -61,11 +61,11 @@ export class RoomManager {
         return room.join(connection);
     }
 
-    createRoom(name: string, playerCount: number) {
+    createRoom(registration: RoomRegistration) {
         let id = randomatic('A0', 5);
         while (this.roomIds.has(id)) id = randomatic('A0', 5); // this code will %99.999999 never run, but for the off case it's needed
         this.roomIds.add(id)
-        this.rooms.push(new Room(id, name, playerCount))
+        this.rooms.push(new Room(id, registration))
         return id;
     }
 }

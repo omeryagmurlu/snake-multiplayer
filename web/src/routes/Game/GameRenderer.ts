@@ -27,7 +27,7 @@ export class GameRenderer {
     private boardConfig!: BoardConfiguration; // 'not undefined' assertion here because: https://github.com/microsoft/TypeScript/issues/36931
 
     public static readonly DEFAULT_BLOCK_SIZE_IN_PIXEL = 20;
-    public static readonly DEFAULT_FOCUS_RATIO = 4/5;
+    public static readonly DEFAULT_FOCUS_RATIO = 1/3;
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -68,10 +68,11 @@ export class GameRenderer {
         if (!this.canRender()) throw new Error('can\'t render, you are doing something wrong')
 
         const myPlayer = this.getPlayerByID(this.myPlayerId);
-        this.setupCamera(this.isActivePlayer(myPlayer.name)
+        const focus = this.isActivePlayer(myPlayer.name)
             ? this.boardConfig.players.find(({ name }) => name === myPlayer.name)!.vectors[0]
             : new Vector(0, 0)
-        )
+        console.log(focus, myPlayer)
+        this.setupCamera(mul(focus, this.blockSizeInPixel))
 
         for (const pellet of this.boardConfig.pellets) {
             this.textures.pellet(pellet.type).draw(mul(pellet.vector, this.blockSizeInPixel), this.ctx)
@@ -117,9 +118,9 @@ export class GameRenderer {
         // camera position is set to players current location when the difference between active cam loc and player gets big
         // don't forget, you are moving the world, not the player, so the vector is inverted
         this.cam.init()
-        // this.cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
-        //     new Vector(focus.x, -focus.y), new Vector(this.canvasSize.x * this.focusRatio, this.canvasSize.x * this.focusRatio), new Vector(0, 0), this.gameSize()
-        // )
+        this.cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
+            new Vector(focus.x, focus.y), new Vector(this.canvasSize.x * this.focusRatio, this.canvasSize.y * this.focusRatio), new Vector(0, 0), this.gameSize()
+        )
     }
 
     private gameSize() {

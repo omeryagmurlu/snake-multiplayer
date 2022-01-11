@@ -13,12 +13,12 @@
 
     let gameConfig: GameConfiguration | undefined = undefined;
     let canvas: HTMLCanvasElement;
-    let innerHeight: number;
-    let innerWidth: number;
+    let clientHeight: number;
+    let clientWidth: number;
     let renderer: GameRenderer | undefined = undefined;
 
-    $: if (gameConfig && canvas && innerWidth && innerHeight) {
-        renderer = new GameRenderer(canvas, new Vector(innerWidth, innerHeight), gameConfig, connection.getId())
+    $: if (gameConfig && canvas && clientWidth && clientHeight) {
+        renderer = new GameRenderer(canvas, new Vector(clientWidth, clientHeight), gameConfig, connection.getId())
     } else {
         renderer = undefined;
     }
@@ -71,15 +71,24 @@
     })
 </script>
 
-<svelte:window bind:innerHeight={innerHeight} bind:innerWidth={innerWidth}/>
 {#if !gameConfig}
     loading
 {:else}
-    <section>
+    <section bind:clientWidth={clientWidth} bind:clientHeight={clientHeight}>
         <canvas
             bind:this={canvas}
-            width={innerWidth}
-            height={innerHeight}
+            width={clientWidth}
+            height={clientHeight}
         ></canvas>
     </section>
 {/if}
+
+<style>
+    section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+    }
+</style>

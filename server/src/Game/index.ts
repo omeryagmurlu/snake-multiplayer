@@ -1,6 +1,6 @@
 import assert from "assert";
 import { Connection, ChannelArray } from "protocol";
-import { PelletType, Direction } from "protocol/dist/interfaces/Game";
+import { Vector as IVector, PelletType, Direction } from "protocol/dist/interfaces/Game";
 import { Vector } from "protocol/dist/classes/Game";
 import { Channels } from "protocol/dist/interfaces/Channels";
 
@@ -28,7 +28,7 @@ export interface Pellet {
     physics: VectorPhysics
 }
 
-const SIZE = new Vector(40, 40);
+const DEFAULT_SIZE = new Vector(40, 40);
 const PAD = new Vector(10, 10);
 const INITIAL_SIZE = 2;
 const TIME = 240 * 1000;
@@ -47,7 +47,8 @@ export class Game {
     private interval: any;
     
     constructor(
-        private players: Player[]
+        private players: Player[],
+        private size: IVector = DEFAULT_SIZE
     ) {
         this.init();
 
@@ -64,7 +65,7 @@ export class Game {
     init() {
         this.ingame = {};
 
-        const initialPhysics = PlayerPhysics.getNRandomInitial(this.players.length, SIZE, PAD, INITIAL_SIZE)
+        const initialPhysics = PlayerPhysics.getNRandomInitial(this.players.length, this.size, PAD, INITIAL_SIZE)
         this.players.forEach((pl, i) => {
             this.ingame[pl.name] = {
                 score: 0,
@@ -74,7 +75,7 @@ export class Game {
             }
         })
 
-        this.wallPhysics = new WallPhysics(SIZE.x, SIZE.y);
+        this.wallPhysics = new WallPhysics(this.size.x, this.size.y);
         this.pellets = []
         this.createPellets();
     }
@@ -129,8 +130,8 @@ export class Game {
         }
 
         const result: Vector[] = [];
-        for (let i = 0; i < SIZE.x; i++) {
-            for (let j = 0; j < SIZE.y; j++) {
+        for (let i = 0; i < this.size.x; i++) {
+            for (let j = 0; j < this.size.y; j++) {
                 if (!matrix[j][i]) result.push(new Vector(i, j))
             }
         }
@@ -148,7 +149,7 @@ export class Game {
 
     sendGameConfiguration() {
         this.channels.broadcast('configure-game', {
-            size: SIZE,
+            size: this.size,
             ended: this.ended,
             startTime: this.startTime,
             totalTime: TIME,
