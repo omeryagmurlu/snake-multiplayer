@@ -4,9 +4,6 @@ import { Channels } from "protocol/dist/interfaces/Channels";
 import { ConnectionManager } from "./ConnectionManager";
 import { RoomManager } from "./RoomManager";
 
-type Send = {};
-type Receive = {};
-
 export class App {
     private rooms = new RoomManager()
 

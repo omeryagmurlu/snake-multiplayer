@@ -28,7 +28,7 @@
     }
 
     const register = async () => {
-        registered = await room.send('register', name, color);
+        registered = await room.send('register', { name, color });
     }
     
     onMount(async () => {

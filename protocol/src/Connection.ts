@@ -41,11 +41,11 @@ export class Connection<Channels extends ChannelListSignature<Channels>> extends
 }
 // params are what we receive, return is what we send back (ack) (only via callback),
 // eg. .on(KEY, (...PARAMS<Receive[KEY]>, cb: (response: RETURN<Receive[KEY]>) => void) => void), see the type in TypedEmitter<.....> for what type is 'on'
-type ReceiverSignature<L> = {
+export type ReceiverSignature<L> = {
     [E in keyof L]: (...args: any[]) => any
 }
 // params are what we send, return is what receive back (ack) (only via promise)
-type SenderSignature<L> = {
+export type SenderSignature<L> = {
     [E in keyof L]: (...args: any[]) => any
 }
 

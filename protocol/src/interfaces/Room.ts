@@ -5,10 +5,15 @@ export interface ServerSend {
 }
 
 export interface ClientSend {
-    register: (pName: string, color: string) => boolean
+    register: (registration: PlayerRegistration) => boolean
     leave: () => void
     ready: (ready: boolean) => void,
     getState: () => DetailedRoomState;
+}
+
+export interface PlayerRegistration {
+    name: string,
+    color: string
 }
 
 export interface Player {

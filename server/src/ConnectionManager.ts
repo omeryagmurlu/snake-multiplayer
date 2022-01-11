@@ -12,15 +12,13 @@ interface ConnectionManagerEvents<T extends Record<string, [any, any]>> {
 const PORT = 3000
 
 export class ConnectionManager<T extends Record<string, [any, any]>> extends TypedEmitter<ConnectionManagerEvents<T>> {
-    private connectedList: Connection<T>[] = []
     private server: HTTPServer
-    private io: IO;
 
     constructor() {
         super()
         
         this.server = createServer();
-        const io = this.io = new IO(this.server, {
+        const io = new IO(this.server, {
             cors: {
               origin: "*",
               methods: ["GET", "POST"]
@@ -30,8 +28,6 @@ export class ConnectionManager<T extends Record<string, [any, any]>> extends Typ
         io.on('connection', async socket => {
             const connection = new Connection(socket)
             if (await connection.verify()) {
-                this.connectedList.push(connection)
-                connection.on('disconnect', () => this.connectedList = this.connectedList.filter(x => x !== connection))
                 this.emit('connect', connection)
             }
         })

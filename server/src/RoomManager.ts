@@ -2,20 +2,20 @@ import { Room } from "./Room";
 import randomatic from 'randomatic';
 import assert from "assert";
 import { trace } from "./utils/Logger";
-import { ChannelArray, Connection } from "protocol";
+import { Connection } from "protocol";
 import { RoomState } from "protocol/dist/interfaces/RoomManagement";
 import { Channels } from "protocol/dist/interfaces/Channels";
+import { ChannelManager } from "./utils/ChannelManager";
 
 type Ch = Channels['room-management']
 
 export class RoomManager {
-    private channels = new ChannelArray<Ch[0], Ch[1]>()
+    private chanman = new ChannelManager<Ch[0], Ch[1]>()
     private rooms: Room[] = []
     private roomIds: Set<string> = new Set();
 
     handleConnection(connection: Connection<Channels>) {
-        const channel = connection.createChannel<Ch[0], Ch[1]>('room-management');
-        this.channels.push(channel);
+        const channel = this.chanman.manage(connection.createChannel('room-management'));
         trace(`created channel 'room-management'`);
         
         channel.on('newRoom', (name, playerCount, callback) => {
@@ -36,10 +36,6 @@ export class RoomManager {
 
             callback(this.getRoomStates())
         })
-
-        channel.onDisconnect(() => {
-            this.channels.remove(channel);
-        })
     }
 
     getRoomStates(): RoomState[] {
@@ -54,7 +50,7 @@ export class RoomManager {
     }
 
     updateClients() {
-        this.channels.broadcast('state', this.getRoomStates())
+        this.chanman.broadcast('state', this.getRoomStates())
     }
 
     joinRoom(id: string, connection: Connection<Channels>): boolean {
@@ -72,5 +68,4 @@ export class RoomManager {
         this.rooms.push(new Room(id, name, playerCount))
         return id;
     }
-    
 }
