@@ -1,79 +1,56 @@
 <script lang="ts">
     import type { Channel, Connection } from "protocol";
+    import { Vector } from "protocol/dist/classes/Game";
     import type { Channels } from "protocol/dist/interfaces/Channels";
-    import { Direction, GameConfiguration } from "protocol/dist/interfaces/Game";
+    import { BoardConfiguration, Direction, GameConfiguration } from "protocol/dist/interfaces/Game";
     import { onMount } from "svelte";
-    import { BLOCK_SIZE_IN_PIXEL, createTick } from "./tick";
+    import { GameRenderer } from "./GameRenderer";
 
     type Ch = Channels['game']
     export let connection: Connection<Channels>
 
     let channel: Channel<Ch[1], Ch[0]>
 
-    let gameConfig: GameConfiguration | undefined = {
-        size: {x: 40, y: 40},
-        players: [
-            {
-                name: 'kir',
-                color: 'red',
-                score: 100,
-                dead: false,
-                dueGrowth: 0
-            },
-            {
-                name: 'mav',
-                color: 'blue',
-                score: 50,
-                dead: false,
-                dueGrowth: 0
-            }
-        ],
-        ended: false,
-        startTime: Date.now(),
-        totalTime: 240000,
-        solid: []
-    };
-    // let gameConfig: GameConfiguration | undefined = undefined;
+    let gameConfig: GameConfiguration | undefined = undefined;
     let canvas: HTMLCanvasElement;
     let innerHeight: number;
     let innerWidth: number;
+    let renderer: GameRenderer | undefined = undefined;
 
-    let tick: () => void;
     $: if (gameConfig && canvas && innerWidth && innerHeight) {
-        tick = createTick(canvas, gameConfig, innerWidth, innerHeight)
+        renderer = new GameRenderer(canvas, new Vector(innerWidth, innerHeight), gameConfig, connection.getId())
     } else {
-        tick = () => {}
+        renderer = undefined;
     }
 
     onMount(() => {
         channel = connection.createChannel('game')
 
-        // channel.on('configure-game', conf => {
-        //     // console.log(conf)
-        //     let str = `
-        //     size: ${conf.size.x}x${conf.size.y}
-        //     players:
-        //     `;
-        //     for (const player of conf.players) {
-        //         str += `name: ${player.name}
-        //         color: ${player.color}
-        //         score: ${player.score}
-        //         dead: ${player.dead}
-        //         due: ${player.dueGrowth}
-        //         `
-        //     }
-        //     str += `ended: ${conf.ended}`
-        //     gameConfig = conf
-        //     console.log(str)
-        //     // document.getElementById('info').innerHTML = str;
-        // })
+        channel.on('configure-game', conf => {
+            gameConfig = conf
+            // console.log(conf)
+            // let str = `
+            // size: ${conf.size.x}x${conf.size.y}
+            // players:
+            // `;
+            // for (const player of conf.players) {
+            //     str += `name: ${player.name}
+            //     color: ${player.color}
+            //     score: ${player.score}
+            //     dead: ${player.dead}
+            //     due: ${player.dueGrowth}
+            //     `
+            // }
+            // str += `ended: ${conf.ended}`
+            // console.log(str)
+            // document.getElementById('info').innerHTML = str;
+        })
 
-        // channel.on('tick', tick)
-        const a = () => {
-            tick()
-            window.requestAnimationFrame(a)
-        }
-        a();
+        channel.on('tick', (b: BoardConfiguration) => {
+            if (!renderer) return;
+            renderer.updateBoardConfiguration(b);
+            renderer.render()
+        })
 
         document.onkeydown = checkKey;
         function checkKey(e: any) {
@@ -96,13 +73,13 @@
 
 <svelte:window bind:innerHeight={innerHeight} bind:innerWidth={innerWidth}/>
 {#if !gameConfig}
-    game starting soon
+    loading
 {:else}
     <section>
         <canvas
             bind:this={canvas}
-            width={Math.min(BLOCK_SIZE_IN_PIXEL * gameConfig.size.x, innerWidth)}
-            height={Math.min(BLOCK_SIZE_IN_PIXEL * gameConfig.size.y, innerHeight)}
+            width={innerWidth}
+            height={innerHeight}
         ></canvas>
     </section>
 {/if}

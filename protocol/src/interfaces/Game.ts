@@ -29,7 +29,8 @@ export interface Player {
     color: string,
     score: number,
     dead: boolean,
-    dueGrowth: number
+    dueGrowth: number,
+    id: string
 }
 
 export interface GameConfiguration {

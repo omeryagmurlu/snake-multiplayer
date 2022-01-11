@@ -63,20 +63,20 @@
                 const matrix = Array(gameconf.size.x).fill(1).map(_ => Array(gameconf.size.y).fill(' '))
 
                 for (const v of gameconf.solid) {
-                    matrix[v.x][v.y] = 'W'
+                    matrix[v.y][v.x] = 'W'
                 }
 
                 for (const pel of conf.pellets) {
                     const v = pel.vector
-                    matrix[v.x][v.y] = 'P'
+                    matrix[v.y][v.x] = 'P'
                 }
 
                 for (const pla of conf.players) {
                     for (const v of pla.vectors) {
-                        matrix[v.x][v.y] = pla.name[0]
+                        matrix[v.y][v.x] = pla.name[0]
                     }
                 }
-                matrix.reverse()
+                {{/* matrix.reverse() */}}
                 document.getElementById('canvas').innerHTML = matrix.map(x => x.join(' ')).join('\n');
             })
 

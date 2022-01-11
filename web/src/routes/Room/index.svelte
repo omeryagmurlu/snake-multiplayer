@@ -3,12 +3,12 @@
 	import type { Channels } from 'protocol/dist/interfaces/Channels';
     import type { DetailedRoomState } from "protocol/dist/interfaces/Room";
     import { onDestroy, onMount } from "svelte";
-import { navigate } from "svelte-routing";
+    import { navigate } from "svelte-routing";
     import ColorPicker from "../../components/ColorPicker.svelte";
     import Input from "../../components/Input.svelte";
     import Tab from "../../components/Tab.svelte";
     import Window from "../../components/Window.svelte";
-import YesNo from "../../components/YesNo.svelte";
+    import YesNo from "../../components/YesNo.svelte";
 
     type ChM = Channels['room-management']
     type Ch = Channels['room-joined']
@@ -66,7 +66,7 @@ import YesNo from "../../components/YesNo.svelte";
     <h2>game starting soon</h2>
 {:else if roomState}
     <Window title={`room ${roomState.name}`}>
-        <div>id: {roomState.id}</div>
+        <div>id: <span class="id">{roomState.id}</span></div>
         {#if !registered}
             <div>register:</div>
             <Tab>
@@ -113,5 +113,9 @@ import YesNo from "../../components/YesNo.svelte";
         grid-template-columns: 1fr 1fr;
         align-items: baseline;
         justify-content: center;
+    }
+
+    .id {
+        user-select: all;
     }
 </style>

@@ -22,22 +22,31 @@ export const createTick = (
 
     return () => {
         j++
-        const i = j % 400
+        const i = j % 600
 
         cam.init()
-        cam.keepPointWithinAreaOfCamera(new Vector(i, i*2), new Vector(400, 400))
+        cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
+            new Vector(i, i*2), new Vector(400, 400), new Vector(0, 0), new Vector(1200, 1200)
+        )
+        // cam.keepPointWithinAreaOfCamera(new Vector(i, i*2), new Vector(400, 400))
 
         ctx.fillStyle = 'purple';
-        ctx.fillRect(0, 0, 800, 800);
+        ctx.fillRect(0, 0, 1200, 1200);
         ctx.fillStyle = 'black';
-        ctx.fillRect(1, 1, 798, 798);
+        ctx.fillRect(1, 1, 1198, 1198);
 
         const v = cam.cameraToContext(new Vector(-200, -200))
         ctx.fillStyle = 'green';
         ctx.fillRect(v.x, v.y, 400, 400);
         ctx.fillStyle = 'black';
         ctx.fillRect(v.x + 1, v.y + 1, 398, 398);
-        
+
+        ctx.strokeStyle = 'rgb(255, 255, 255)';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(600, 1200);
+        ctx.stroke();
+
         ctx.fillStyle = 'rgb(255, 255, 255)';
         ctx.fillRect(i, i*2, 5, 5);
 

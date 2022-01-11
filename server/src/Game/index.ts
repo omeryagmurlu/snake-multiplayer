@@ -123,15 +123,15 @@ export class Game {
         for (const c of cts) {
             const vs = c.getCollidableVectors();
             for (const v of vs) {
-                matrix[v.x] = matrix[v.x] ?? []
-                matrix[v.x][v.y] = true;
+                matrix[v.y] = matrix[v.y] ?? []
+                matrix[v.y][v.x] = true;
             }
         }
 
         const result: Vector[] = [];
         for (let i = 0; i < SIZE.x; i++) {
             for (let j = 0; j < SIZE.y; j++) {
-                if (!matrix[i][j]) result.push(new Vector(i, j))
+                if (!matrix[j][i]) result.push(new Vector(i, j))
             }
         }
 
@@ -152,11 +152,12 @@ export class Game {
             ended: this.ended,
             startTime: this.startTime,
             totalTime: TIME,
-            players: this.players.map(({ name, color }) => ({
+            players: this.players.map(({ name, color, connection }) => ({
                 name, color,
                 score: this.ingame[name].score,
                 dueGrowth: this.ingame[name].dueGrowth,
                 dead: this.ingame[name].dead,
+                id: connection.getId()
             })),
             solid: this.wallPhysics.getCollidableVectors()
         })
