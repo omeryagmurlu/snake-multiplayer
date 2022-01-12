@@ -1,3 +1,7 @@
+# Missing Functionality
+- flutter app
+- different control mechanisms
+
 # Bugfix
 - server/Room@ready should noop if inGame
 - server/Game overall needs leave mechanisms
