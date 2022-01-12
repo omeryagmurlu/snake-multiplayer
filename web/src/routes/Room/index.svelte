@@ -2,6 +2,7 @@
     import type { Channel, Connection } from "protocol";
 	import type { Channels } from 'protocol/dist/interfaces/Channels';
     import type { DetailedRoomState } from "protocol/dist/interfaces/Room";
+    import randomatic from 'randomatic';
     import { onDestroy, onMount } from "svelte";
     import { navigate } from "svelte-routing";
     import ColorPicker from "../../components/ColorPicker.svelte";
@@ -19,7 +20,7 @@
     let room: Channel<Ch[1], Ch[0]>;
     let roomState: DetailedRoomState | undefined = undefined;
     let registered = false;
-    let name: string;
+    let name: string = randomatic('a', 5);
     let color: string;
     let gameStarting = false;
 

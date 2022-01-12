@@ -17,8 +17,8 @@
     let clientWidth: number;
     let renderer: GameRenderer | undefined = undefined;
 
-    $: if (gameConfig && canvas && clientWidth && clientHeight) {
-        renderer = new GameRenderer(canvas, new Vector(clientWidth, clientHeight), gameConfig, connection.getId())
+    $: if (canvas && clientWidth && clientHeight) {
+        renderer = new GameRenderer(canvas, new Vector(clientWidth, clientHeight), connection.getId())
     } else {
         renderer = undefined;
     }
@@ -28,6 +28,8 @@
 
         channel.on('configure-game', conf => {
             gameConfig = conf
+            if (!renderer) throw new Error("no renderer");
+            renderer.updateGameConfiguration(gameConfig);
             // console.log(conf)
             // let str = `
             // size: ${conf.size.x}x${conf.size.y}
@@ -71,17 +73,17 @@
     })
 </script>
 
-{#if !gameConfig}
-    loading
-{:else}
-    <section bind:clientWidth={clientWidth} bind:clientHeight={clientHeight}>
+<section bind:clientWidth={clientWidth} bind:clientHeight={clientHeight}>
+        {#if !gameConfig}
+            loading
+        {/if}
         <canvas
+            class:hidden={!gameConfig}
             bind:this={canvas}
             width={clientWidth}
             height={clientHeight}
         ></canvas>
     </section>
-{/if}
 
 <style>
     section {
@@ -90,5 +92,9 @@
         justify-content: center;
         width: 100vw;
         height: 100vh;
+    }
+
+    canvas.hidden {
+        display: none;
     }
 </style>

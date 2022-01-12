@@ -3,6 +3,7 @@
     import { Vector } from "protocol/dist/classes/Game";
     import type { Channels } from "protocol/dist/interfaces/Channels";
     import { onMount } from "svelte";
+    import randomatic from "randomatic";
     import { navigate } from "svelte-routing";
 
     import Input from "../components/Input.svelte";
@@ -12,8 +13,8 @@
     export let connection: Connection<Channels>
     let roomManagement: Channel<Ch[1], Ch[0]>
 
-    let name: string;
-    let count: number;
+    let name: string = randomatic('a', 5);
+    let count: number = 2;
     let sizeW: number = 40;
     let sizeH: number = 40;
 

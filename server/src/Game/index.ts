@@ -89,7 +89,7 @@ export class Game {
         const r = Math.random()
         if (r > 0.9) return { color: 'yellow', growth: 10, score: 25 }
         if (r > 0.6) return { color: 'red', growth: 5, score: 10 }
-        return { color: 'none', growth: 1, score: 1 }
+        return { color: 'gray', growth: 1, score: 1 }
     }
 
     createPellets() {

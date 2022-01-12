@@ -14,25 +14,27 @@ const mul = (v: IVector, n: number) => new Vector(v.x * n, v.y * n);
 class ColorSquareTextures implements GameTextureSet {
     public solid: ColorSquare;
     constructor(private size: number) {
-        this.solid = ColorSquare.colorSquare('gray', size)
+        this.solid = ColorSquare.colorSquare('rgba(0, 0, 0, 0.5)', size)
     }
     public pellet({ color }: PelletType) { return ColorSquare.colorSquare(color, this.size) }
     public player({ color }: Player) { return ColorSquare.colorSquare(color, this.size) }
 }
+
+const ACCENT = '#9bbc0f';
 
 export class GameRenderer {
     private cam: Camera;
     private ctx: CanvasRenderingContext2D;
     private textures: GameTextureSet;
     private boardConfig!: BoardConfiguration; // 'not undefined' assertion here because: https://github.com/microsoft/TypeScript/issues/36931
+    private gameConfig!: GameConfiguration; // same here
 
-    public static readonly DEFAULT_BLOCK_SIZE_IN_PIXEL = 20;
+    public static readonly DEFAULT_BLOCK_SIZE_IN_PIXEL = 18;
     public static readonly DEFAULT_FOCUS_RATIO = 1/3;
 
     constructor(
         private canvas: HTMLCanvasElement,
         private canvasSize: Vector,
-        private gameConfig: GameConfiguration,
         private myPlayerId: string,
         private blockSizeInPixel: number = GameRenderer.DEFAULT_BLOCK_SIZE_IN_PIXEL,
         private focusRatio: number = GameRenderer.DEFAULT_FOCUS_RATIO,
@@ -71,8 +73,10 @@ export class GameRenderer {
         const focus = this.isActivePlayer(myPlayer.name)
             ? this.boardConfig.players.find(({ name }) => name === myPlayer.name)!.vectors[0]
             : new Vector(0, 0)
-        console.log(focus, myPlayer)
         this.setupCamera(mul(focus, this.blockSizeInPixel))
+
+        this.ctx.fillStyle = ACCENT;
+        this.ctx.fillRect(0, 0, this.gameSize().x, this.gameSize().y)
 
         for (const pellet of this.boardConfig.pellets) {
             this.textures.pellet(pellet.type).draw(mul(pellet.vector, this.blockSizeInPixel), this.ctx)
@@ -81,8 +85,6 @@ export class GameRenderer {
         for (const player of this.boardConfig.players) {
             this.drawPlayer(player);
         }
-
-        console.log(this.gameConfig.solid)
 
         for (const v of this.gameConfig.solid) {
             this.textures.solid.draw(mul(v, this.blockSizeInPixel), this.ctx);
