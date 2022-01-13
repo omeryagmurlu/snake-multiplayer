@@ -2,8 +2,10 @@
     import type { Channel, Connection } from "protocol";
     import { Vector } from "protocol/dist/classes/Game";
     import type { Channels } from "protocol/dist/interfaces/Channels";
-    import { BoardConfiguration, Direction, GameConfiguration } from "protocol/dist/interfaces/Game";
-    import { onMount } from "svelte";
+    import type { BoardConfiguration, GameConfiguration } from "protocol/dist/interfaces/Game";
+    import { onDestroy, onMount } from "svelte";
+    import { controls } from "../../stores/settings";
+    import { GameControls } from "./Controls";
     import { GameRenderer } from "./GameRenderer";
 
     type Ch = Channels['game']
@@ -23,6 +25,8 @@
         renderer = undefined;
     }
 
+    let gameControl: GameControls = GameControls.get($controls)
+
     onMount(() => {
         channel = connection.createChannel('game')
 
@@ -36,40 +40,30 @@
             // players:
             // `;
             // for (const player of conf.players) {
-            //     str += `name: ${player.name}
-            //     color: ${player.color}
-            //     score: ${player.score}
-            //     dead: ${player.dead}
-            //     due: ${player.dueGrowth}
-            //     `
-            // }
-            // str += `ended: ${conf.ended}`
-            // console.log(str)
-            // document.getElementById('info').innerHTML = str;
-        })
+                //     str += `name: ${player.name}
+                //     color: ${player.color}
+                //     score: ${player.score}
+                //     dead: ${player.dead}
+                //     due: ${player.dueGrowth}
+                //     `
+                // }
+                // str += `ended: ${conf.ended}`
+                // console.log(str)
+                // document.getElementById('info').innerHTML = str;
+            })
+            
+            channel.on('tick', (b: BoardConfiguration) => {
+                if (!renderer) return;
+                renderer.updateBoardConfiguration(b);
+                renderer.render()
+            })
+            
+        gameControl.init(canvas)
+        gameControl.onDirection(dir => channel.send('input', dir))
+    })
 
-        channel.on('tick', (b: BoardConfiguration) => {
-            if (!renderer) return;
-            renderer.updateBoardConfiguration(b);
-            renderer.render()
-        })
-
-        document.onkeydown = checkKey;
-        function checkKey(e: any) {
-            e = e || window.event;
-            if (e.keyCode == '38') {
-                channel.send('input', Direction.Up)
-            }
-            else if (e.keyCode == '40') {
-                channel.send('input', Direction.Down)
-            }
-            else if (e.keyCode == '37') {
-                channel.send('input', Direction.Left)
-            }
-            else if (e.keyCode == '39') {
-                channel.send('input', Direction.Right)
-            }
-        }
+    onDestroy(() => {
+        gameControl.destroy()
     })
 </script>
 

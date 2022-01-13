@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { ControlTypes } from "../routes/Game/Controls";
 
 // detectmobilebrowsers.com
 export const mobileCheck = function() {
@@ -12,10 +13,4 @@ export const sensorCheck = () => {
     return !!window.DeviceOrientationEvent && mobileCheck()
 }
 
-export enum Control {
-    Keyboard = "KEYBOARD",
-    Swipe = "SWIPE",
-    Sensor = "SENSOR"
-}
-
-export const controls = writable<Control>(mobileCheck() ? Control.Swipe : Control.Keyboard)
+export const controls = writable<ControlTypes>(mobileCheck() ? ControlTypes.Swipe : ControlTypes.Keyboard)
