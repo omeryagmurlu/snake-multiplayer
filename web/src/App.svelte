@@ -7,6 +7,8 @@
 	import Room from "./routes/Room/index.svelte"; // lobby
 	import Game from "./routes/Game/index.svelte";
 	import Connection from "./Connection.svelte";
+	import Home from "./routes/Home.svelte";
+	import Controls from "./routes/Controls.svelte";
 
 </script>
 
@@ -14,6 +16,12 @@
 	<!-- this is the problematic part, connection is undefined no matter what I do -->
 	<Connection let:connection={connection}>
 		<Route path="/">
+			<Home />
+		</Route>
+		<Route path="/controls">
+			<Controls />
+		</Route>
+		<Route path="/rooms">
 			<RoomList connection={connection} />
 		</Route>
 		<Route path="/room/:code" let:params>
