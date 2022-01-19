@@ -1,47 +1,61 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+import 'dart:async';
 
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DemoWidget());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class DemoWidget extends StatefulWidget {
+  const DemoWidget({Key? key}) : super(key: key);
+
+  @override
+  _DemoWidgetState createState() => _DemoWidgetState();
+}
+
+class _DemoWidgetState extends State<DemoWidget> with SingleTickerProviderStateMixin {
+  late Timer timer; 
+  double val = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+      setState(() {
+        val = (timer.tick % 10) / 10;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Welcome to Flutter',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
-        ),
-        body: const Center(
-          child: RandomWords(),
-        ),
-      ),
+    return CustomPaint(
+      painter: MyPainter(val),
     );
   }
 }
 
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-  
+class MyPainter extends CustomPainter {
+  final double value;
+
+  MyPainter(this.value);
+
   @override
-  Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
-    return Text(wordPair.asPascalCase);
+  void paint(Canvas canvas, Size size) {
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      value * size.shortestSide,
+      Paint()..color = Colors.blue,
+    );
   }
-}
-
-class RandomWords extends StatefulWidget {
-  const RandomWords({Key? key}) : super(key: key);
 
   @override
-  State<RandomWords> createState() => _RandomWordsState();
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

@@ -30,7 +30,7 @@ class _RoomListState extends State<RoomList> {
 
     _channel = widget.connection.createChannel('room-management');
 
-    _channel.on('state', null, evfn((d, _) { 
+    _channel.on('state', context, evfn((d, _) { 
       setState(() {
         _rooms = RoomState.fromJsonList(d.cast<Map<String, dynamic>>());
       });

@@ -18,6 +18,7 @@
     export let code: string
 
     let room: Channel<Ch[1], Ch[0]>;
+    let roomManagement: Channel<ChM[1], ChM[0]>;
     let roomState: DetailedRoomState | undefined = undefined;
     let registered = false;
     let name: string = randomatic('a', 5);
@@ -33,12 +34,15 @@
     }
     
     onMount(async () => {
-        const roomManagement = connection.createChannel<ChM[1], ChM[0]>('room-management')
+        roomManagement = connection.createChannel<ChM[1], ChM[0]>('room-management')
 
         const success = await roomManagement.send('joinRoom', code)
-        if (!success) window.history.back() // TODO, maybe error etc
-        
         room = connection.createChannel<Ch[1], Ch[0]>('room-joined')
+        if (!success) {
+            window.history.back() // TODO, maybe error etc
+            return;
+        }
+        
         room.send('getState').then(x => roomState = x)
 
         room.on("state", state => {
@@ -56,6 +60,7 @@
     })
 
     onDestroy(() => { // this thing should be on all channels..., well whatevs doesn't matter that much
+        roomManagement.destroy();
         room.send('leave')
         room.destroy()
     })

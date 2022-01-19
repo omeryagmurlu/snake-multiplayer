@@ -7,7 +7,8 @@ String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
     length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
 evfn(void Function(dynamic, Function) fn) => (ev, context) {
-  final dynamic d = (ev.eventData! as List)[0];
-  final dynamic c = (ev.eventData! as List)[1];
+  final list = (ev.eventData! as List);
+  final dynamic d = list[0];
+  final dynamic c = list.length > 1 ? list[1] : () {};
   fn(d, c);
 };
