@@ -9,7 +9,7 @@
 	let connection: Connection<Channels> | undefined = undefined
 
 	onMount(() => {
-		const socket = io(config.gameServer)
+		const socket = io(config.gameServer ?? (window.location.hostname + ':3000'))
 		socket.on('connect', async () => {
 			connection = new Connection(socket)
 		})

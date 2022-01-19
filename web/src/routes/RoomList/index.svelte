@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Connection } from "protocol";
+    import type { Channel, Connection } from "protocol";
 	import type { Channels } from 'protocol/dist/interfaces/Channels';
     import type { RoomState } from "protocol/dist/interfaces/RoomManagement";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Window from "../../components/Window.svelte";
     import { Link } from "svelte-routing";
     import Tab from "../../components/Tab.svelte";
@@ -12,14 +12,19 @@
     export let connection: Connection<Channels>
     
     let rooms: RoomState[] = []
+    let channel: Channel<Ch[1], Ch[0]>;
 
     onMount(async () => {
-        const roomManagement = connection.createChannel<Ch[1], Ch[0]>('room-management')
+        channel = connection.createChannel<Ch[1], Ch[0]>('room-management')
         
-        roomManagement.on('state', state => {
+        channel.on('state', state => {
             rooms = state;
         })
-        rooms = await roomManagement.send('getRoomStates')
+        rooms = await channel.send('getRoomStates')
+    })
+
+    onDestroy(() => {
+        channel.destroy();
     })
 </script>
 

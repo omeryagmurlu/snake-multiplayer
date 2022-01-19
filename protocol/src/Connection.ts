@@ -70,7 +70,7 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
         this.socket.on('disconnect', this.onSocketDisconnect)
     }
 
-    private onSocket = <K extends keyof Receive>(json: string, callback: (response: ReturnType<Receive[K]>) => void) => {
+    private onSocket = <K extends keyof Receive>(json: string, callback: (response: string) => void) => {
         // currently not using ack numbers, but they are still in the makeshift protocol (may swap socket.io with something else later)
         const {
             name, data, ack = 0
@@ -80,7 +80,7 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
 
         let tmp = [...data, (response: ReturnType<Receive[K]>) => {
             if (ack !== 0) {
-                callback(response)
+                callback(JSON.stringify(response))
             }
             // else, nop
         }] as Parameters<Helper<Receive>[K]>
@@ -102,8 +102,8 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
                 name,
                 data,
                 ack
-            }), (response: any) => {
-                res(response)
+            }), (response: string) => {
+                res(JSON.parse(response))
             })
         })
     }

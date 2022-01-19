@@ -2,7 +2,7 @@
     import type { Channel, Connection } from "protocol";
     import { Vector } from "protocol/dist/classes/Game";
     import type { Channels } from "protocol/dist/interfaces/Channels";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import randomatic from "randomatic";
     import { navigate } from "svelte-routing";
 
@@ -27,6 +27,10 @@
 
     onMount(async () => { // onDestroy would be good but I'm lazy, no one is gonna use this anyway
         roomManagement = connection.createChannel<Ch[1], Ch[0]>('room-management')
+    })
+
+    onDestroy(() => {
+        roomManagement.destroy();
     })
 </script>
 

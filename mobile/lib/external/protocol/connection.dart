@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert' as convert;
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:eventify/eventify.dart';
@@ -29,7 +30,7 @@ class Connection extends EventEmitter {
     return true;
   }
 
-  createChannel(String name) {
+  Channel createChannel(String name) {
     return Channel(name, _socket);
   }
 }
@@ -56,17 +57,13 @@ class Channel extends EventEmitter {
     final json = incoming.first as String;
     final ackCb = incoming.last as Function;
 
-    // TODO remove dis
-    debugPrint("Following should always be [jsonString, ackCallback]");
-    debugPrint(incoming);
-
     final Map<String, dynamic> jsonMap = convert.json.decode(json);
     final String name = jsonMap["name"];
     final List<dynamic> data = jsonMap["data"];
     final int ack = jsonMap["ack"] ?? 0;
 
     emit(name, null, [...data, 
-      if (ack != 0) (dynamic resp) => ackCb(resp)
+      if (ack != 0) (dynamic resp) => ackCb(convert.json.encode(resp))
       else () {}
     ]);
   }
@@ -76,16 +73,17 @@ class Channel extends EventEmitter {
     destroy();
   }
 
-  Future<dynamic> send(String name, List<dynamic> data) {
-    final completer = Completer();
+  Future<dynamic> send(String name, [dynamic data]) {
+    final completer = Completer<dynamic>();
+    final List<dynamic> dataList = data == null ? [] : [data];
 
     final ackNum = _globalAck++;
     _socket.emitWithAck(_name, convert.json.encode(<String, dynamic>{
       'name': name,
-      'data': data,
+      'data': dataList,
       'ack': ackNum
-    }), ack: (dynamic resp) {
-      completer.complete(resp);
+    }), ack: (String resp) {
+      completer.complete(convert.json.decode(resp));
     });
 
     return completer.future;
@@ -102,7 +100,7 @@ class Channel extends EventEmitter {
 
 // I'm not sure if this is a good idea???
 extension ChannelList on List<Channel> {
-  void broadcast(String name, List<dynamic> data) {
+  void broadcast(String name, List<Object> data) {
     for (var channel in this) {
       channel.send(name, data);
     }

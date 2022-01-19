@@ -7,15 +7,12 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Window(
+    return const Window(
       title: "multiplayer snake",
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Link(to: '/rooms', title: 'rooms'),
-          Link(to: '/controls', title: 'controls'),
-        ],
-      )
+      children: [
+        Link(to: '/rooms', title: 'rooms'),
+        Link(to: '/controls', title: 'controls'),
+      ],
     );
   }
 }

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class Window extends StatelessWidget {
   const Window({
     Key? key,
-    required this.body,
+    required this.children,
     this.title,
   }) : super(key: key);
 
-  final Widget body;
+  final List<Widget> children;
   final String? title;
 
   @override
@@ -20,7 +20,10 @@ class Window extends StatelessWidget {
           children: <Widget>[
             // I fucking hate this: http://dart.dev/go/non-promo-property (notice the exclamation mark at the end of title)
             if (title != null) Text(title!),
-            Container(child: body)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children
+            )
           ],
         ),
       ),

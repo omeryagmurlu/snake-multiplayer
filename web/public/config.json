@@ -1,4 +1,4 @@
 {
-    "gameServer": "http://localhost:3000",
+    "gameServer": null,
     "title": "Multiplayer Retro Snake"
 }
