@@ -94,7 +94,7 @@ class PlayerPositioning {
   PlayerPositioning({required this.name, required this.vectors});
 
   String name;
-  List<Vector> vectors;
+  List<Pixel> vectors;
 
   factory PlayerPositioning.fromJson(Map<String, dynamic> json) => _$PlayerPositioningFromJson(json);
   Map<String, dynamic> toJson() => _$PlayerPositioningToJson(this);

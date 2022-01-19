@@ -59,6 +59,10 @@ export class Game {
             this.channels.push(channel)
             
             channel.on("input", this.handleInput(pl))
+            channel.on('getGameConfiguration', cb => {
+                this.sendGameConfiguration();
+                cb(this.getGameConfiguration());
+            });
         }
     }
 
@@ -87,9 +91,9 @@ export class Game {
 
     randomPelletType(): PelletType {
         const r = Math.random()
-        if (r > 0.9) return { color: 'yellow', growth: 10, score: 25 }
-        if (r > 0.6) return { color: 'red', growth: 5, score: 10 }
-        return { color: 'gray', growth: 1, score: 1 }
+        if (r > 0.9) return { color: '#00ffff', growth: 10, score: 25 }
+        if (r > 0.6) return { color: '#ff0000', growth: 5, score: 10 }
+        return { color: '#888888', growth: 1, score: 1 }
     }
 
     createPellets() {
@@ -148,7 +152,11 @@ export class Game {
     }
 
     sendGameConfiguration() {
-        this.channels.broadcast('configure-game', {
+        this.channels.broadcast('configure-game', this.getGameConfiguration())
+    }
+
+    getGameConfiguration() {
+        return {
             size: this.size,
             ended: this.ended,
             startTime: this.startTime,
@@ -161,7 +169,7 @@ export class Game {
                 id: connection.getId()
             })),
             solid: this.wallPhysics.getCollidableVectors()
-        })
+        };
     }
 
     sendBoardConfiguration() {

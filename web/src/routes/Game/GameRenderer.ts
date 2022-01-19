@@ -119,10 +119,10 @@ export class GameRenderer {
         // if game fits within bounds, don't move camera at all, otherwise move camera.
         // camera position is set to players current location when the difference between active cam loc and player gets big
         // don't forget, you are moving the world, not the player, so the vector is inverted
-        this.cam.init()
         this.cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
             new Vector(focus.x, focus.y), new Vector(this.canvasSize.x * this.focusRatio, this.canvasSize.y * this.focusRatio), new Vector(0, 0), this.gameSize()
         )
+        this.cam.init()
     }
 
     private gameSize() {

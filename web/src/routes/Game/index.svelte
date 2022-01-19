@@ -50,13 +50,13 @@
                 // str += `ended: ${conf.ended}`
                 // console.log(str)
                 // document.getElementById('info').innerHTML = str;
-            })
-            
-            channel.on('tick', (b: BoardConfiguration) => {
-                if (!renderer) return;
-                renderer.updateBoardConfiguration(b);
-                renderer.render()
-            })
+        })
+        
+        channel.on('tick', (b: BoardConfiguration) => {
+            if (!renderer) return;
+            renderer.updateBoardConfiguration(b);
+            renderer.render()
+        })
             
         gameControl.init(canvas)
         gameControl.onDirection(dir => channel.send('input', dir))
@@ -64,6 +64,7 @@
 
     onDestroy(() => {
         gameControl.destroy()
+        channel.destroy()
     })
 </script>
 
