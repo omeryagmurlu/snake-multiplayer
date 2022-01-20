@@ -59,6 +59,8 @@ export class Camera {
     //     }
     // }
 
+    // area -> centered area where player should reside
+    // ctxArea,Origin -> where would the be rendered?
     keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
         point: IVector, area: IVector, ctxOrigin: IVector, ctxArea: IVector
     ) {

@@ -7,7 +7,6 @@ Vector multiply(Vector v, int n) => Vector(x: (v.x * n), y: (v.y * n));
 Offset toOffset(Vector v) => Offset(v.x.toDouble(), v.y.toDouble());
 
 class GameRenderer extends CustomPainter { // basically the render function, but we need to update it
-  final Camera cam;
   final GameTextureSet textures;
   final BoardConfiguration boardConfig;
   final GameConfiguration gameConfig;
@@ -30,7 +29,6 @@ class GameRenderer extends CustomPainter { // basically the render function, but
     this.focusRatio = defaultFocusRatio,
     backgroundColor = defaultBackGroundColor,
   }):
-    cam = Camera(),
     _backgroundPaint = Paint()..color = backgroundColor,
     textures = ColorSquareTextures(blockSizeInPixel);
 
@@ -46,11 +44,10 @@ class GameRenderer extends CustomPainter { // basically the render function, but
     final focus = isActivePlayer(myPlayer.name)
       ? boardConfig.players.where((pl) => pl.name == myPlayer.name).first.vectors[0]
       : Vector(x: 0, y: 0);
-    setupCamera(toOffset(mul(focus))); // not imp yet
+    setupCamera(toOffset(mul(focus)), canvas, size); // not imp yet
 
-    final gameSize = toOffset(mul(gameConfig.size));
     canvas.drawRect(
-      Rect.fromLTWH(0, 0, gameSize.dx, gameSize.dy),
+      Rect.fromLTWH(0, 0, gameSize().dx, gameSize().dy),
       _backgroundPaint
     );
 
@@ -88,9 +85,10 @@ class GameRenderer extends CustomPainter { // basically the render function, but
   
   Vector mul(Vector v) => multiply(v, blockSizeInPixel);
 
-  void setupCamera(Offset offset) {
-    cam.center();
-    cam.init();
+  void setupCamera(Offset focus, Canvas canvas, Size size) {
+    final cam = Camera(canvas, size);
+    cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(focus, Offset(size.width * focusRatio, size.height * focusRatio), Offset.zero, gameSize());
+    cam.apply();
   }
 
   void drawPlayer(PlayerPositioning positioning, Canvas canvas) {
@@ -103,4 +101,6 @@ class GameRenderer extends CustomPainter { // basically the render function, but
       ).draw(mul(positioning.vectors[i]), canvas);
     }
   }
+
+  Offset gameSize() => toOffset(mul(gameConfig.size));
 }
