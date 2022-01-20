@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile/components/window.dart';
 import 'package:mobile/external/protocol/connection.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
+import 'package:mobile/routes/game/controls/index.dart';
 import 'package:mobile/routes/game/game_renderer.dart';
+import 'package:mobile/stores/settings.dart';
 import 'package:mobile/util.dart';
 
 class Game extends StatefulWidget {
@@ -17,6 +19,7 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   late Channel _channel;
+  late GameControls _control;
 
   BoardConfiguration? boardConfig;
   GameConfiguration? gameConfig;
@@ -26,7 +29,6 @@ class _GameState extends State<Game> {
     super.initState();
     
     _channel = widget.connection.createChannel('game');
-
     _channel.send('getGameConfiguration');
 
     _channel.on('configure-game', context, evfn((conf, _) {
@@ -40,6 +42,22 @@ class _GameState extends State<Game> {
         boardConfig = BoardConfiguration.fromJson(conf);
       });
     }));
+
+    _control = GameControls.get(MyControls.control);
+    _control.onDirection((dir) {
+      debugPrint(dir.toJson());
+      _channel.send('input', dir.toJson());
+    });
+    _control.init();
+  }
+
+  @override
+  void dispose() {
+    debugPrint("game leave");
+    _control.destroy();
+    _channel.send('leave');
+    _channel.destroy();
+    super.dispose();
   }
 
   @override

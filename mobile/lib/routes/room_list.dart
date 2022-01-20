@@ -44,6 +44,7 @@ class _RoomListState extends State<RoomList> {
 
   @override
   void dispose() {
+    debugPrint("roomlist leave");
     _channel.destroy();
     super.dispose();
   }

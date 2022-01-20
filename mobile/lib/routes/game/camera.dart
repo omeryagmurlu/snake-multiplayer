@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 class Camera {
   Offset cam;
   Canvas canvas;
-  Offset size;
+  Offset canvasSize;
+  Offset gameSize;
+  Offset gameOrigin;
 
-  Camera(this.canvas, Size ssize):
-    size = Offset(ssize.width, ssize.height),
+  Camera(this.canvas, Size ssize, this.gameSize, this.gameOrigin):
+    canvasSize = Offset(ssize.width, ssize.height),
     cam = Offset(ssize.width / 2, ssize.height / 2);
   
   void apply() {
@@ -19,43 +21,31 @@ class Camera {
     // this is currently placeholder for clearRect.
     canvas.drawRect(Rect.fromLTWH(
       0, 0, 
-      size.dx, size.dy
+      canvasSize.dx, canvasSize.dy
     ), Paint()..color = Colors.black);
 
-    final to = (-cam + size) / 2;
+    final to = (-cam + canvasSize) / 2;
     canvas.translate(to.dx, to.dy);
   }
 
   absolute(Offset to) {
     cam = to;
   }
-  
-  void centerCanvas(Offset ctxOrigin, Offset ctxArea) {
-    absolute((ctxOrigin + ctxArea) / 2);
+
+  centered(Offset point) {
+    absolute(Offset(
+      clamp(point.dx, gameOrigin.dx, gameSize.dx, canvasSize.dx), 
+      clamp(point.dy, gameOrigin.dy, gameSize.dy, canvasSize.dy)
+    ));
   }
 
-  void keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(Offset point, Offset area, Offset ctxOrigin, Offset ctxArea) {
-    if (size > ctxArea) {
-      centerCanvas(ctxOrigin, ctxArea);
-      return;
-    }
+  static double clamp(double worldPosition, double worldOrigin, double worldLength, double camLength) {
+    final min = worldOrigin + camLength / 2;
+    final max = (worldOrigin + worldLength) - camLength / 2;
 
-    final camLoc = contextToCamera(point);
-    if (camLoc.dx.abs() > area.dx/2 || camLoc.dy.abs() > area.dy/2) {
-      final topLeft = Offset(
-        -min<double>(0, (point.dx - area.dx/2) - (ctxOrigin.dx)),
-        -min<double>(0, (point.dy - area.dy/2) - (ctxOrigin.dy))
-      );
-      final botRight = Offset(
-        -max<double>(0, (point.dx + area.dx/2) - (ctxOrigin.dx + ctxArea.dx)),
-        -max<double>(0, (point.dy + area.dy/2) - (ctxOrigin.dy + ctxArea.dy))
-      );
-      absolute(point + topLeft + botRight);
-    }
+    if (camLength > worldLength) return (worldOrigin + worldLength) / 2;
+    if (worldPosition < min) return min;
+    if (worldPosition > max) return max;
+    return worldPosition;
   }
-
-  Offset contextToCamera(Offset v) {
-    return v - cam;
-  }
-
 }

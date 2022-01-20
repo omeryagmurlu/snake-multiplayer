@@ -110,6 +110,7 @@ export class Channel<Send extends SenderSignature<Send>, Receive extends Receive
 
     destroy() {
         if (!this.socket) return;
+        console.log(`destroy ${this.name}`);
         this.socket.removeListener(this.name, this.onSocket)
         this.socket.removeListener('disconnect', this.onSocketDisconnect)
         this.socket = undefined as unknown as Socket; // wtf? why

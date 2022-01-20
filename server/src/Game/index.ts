@@ -7,6 +7,7 @@ import { Channels } from "protocol/dist/interfaces/Channels";
 import { trace } from "../utils/Logger";
 import { shuffleArray } from "./GameUtils";
 import { Collidable, getCollision, PlayerPhysics, VectorPhysics, WallPhysics } from "./Physics";
+import { ChannelManager } from "../utils/ChannelManager";
 
 type Ch = Channels['game']
 
@@ -36,7 +37,7 @@ const TICKTIME = 750;
 const PELLET_COUNT = 3;
 
 export class Game {
-    private channels: ChannelArray<Ch[0], Ch[1]>;
+    private chanman = new ChannelManager<Ch[0], Ch[1], string>()
 
     private ingame!: Record<string, IngamePlayer>;
     private pellets!: Pellet[];
@@ -52,17 +53,27 @@ export class Game {
     ) {
         this.init();
 
-        this.channels = new ChannelArray();
+        this.chanman.on('left', (_, name) => {
+            trace(`game: left ${name}`)
+            if (this.ingame[name]) {
+                trace(`game: killed left ${name}`);
+                this.ingame[name].dead = true;
+            }
+        })
+
         for (const pl of this.players) {
-            const channel = pl.connection.createChannel<Ch[0], Ch[1]>("game")
             trace('game: creating channel')
-            this.channels.push(channel)
+            const channel = this.chanman.manage(pl.connection.createChannel<Ch[0], Ch[1]>("game"), pl.name);
             
             channel.on("input", this.handleInput(pl))
             channel.on('getGameConfiguration', cb => {
                 this.sendGameConfiguration();
                 cb(this.getGameConfiguration());
             });
+            channel.on('leave', () => {
+                trace(`'game': leave()`);
+                this.chanman.remove(channel);
+            })
         }
     }
 
@@ -152,7 +163,7 @@ export class Game {
     }
 
     sendGameConfiguration() {
-        this.channels.broadcast('configure-game', this.getGameConfiguration())
+        this.chanman.broadcast('configure-game', this.getGameConfiguration())
     }
 
     getGameConfiguration() {
@@ -173,7 +184,7 @@ export class Game {
     }
 
     sendBoardConfiguration() {
-        this.channels.broadcast('tick', {
+        this.chanman.broadcast('tick', {
             pellets: this.pellets.map(({ type, physics }) => ({
                 type,
                 vector: physics.getCollidableVectors()[0]

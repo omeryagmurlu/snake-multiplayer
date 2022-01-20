@@ -86,8 +86,8 @@ class GameRenderer extends CustomPainter { // basically the render function, but
   Vector mul(Vector v) => multiply(v, blockSizeInPixel);
 
   void setupCamera(Offset focus, Canvas canvas, Size size) {
-    final cam = Camera(canvas, size);
-    cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(focus, Offset(size.width * focusRatio, size.height * focusRatio), Offset.zero, gameSize());
+    final cam = Camera(canvas, size, gameSize(), Offset.zero);
+    cam.centered(focus);
     cam.apply();
   }
 

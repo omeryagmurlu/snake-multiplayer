@@ -1,23 +1,21 @@
 import { Channel, ChannelArray, ReceiverSignature, SenderSignature } from "protocol";
 import { TypedEmitter } from "tiny-typed-emitter";
 
-interface ChannelManagerEvents<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>> {
-    left: (channel: Channel<Send, Receive>) => void
+interface ChannelManagerEvents<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>, Id> {
+    left: (channel: Channel<Send, Receive>, identifier: Id) => void
 }
 
-export class ChannelManager<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>> extends TypedEmitter<ChannelManagerEvents<Send, Receive>> {
+export class ChannelManager<Send extends SenderSignature<Send>, Receive extends ReceiverSignature<Receive>, Id = void> extends TypedEmitter<ChannelManagerEvents<Send, Receive, Id>> {
     private channels = new ChannelArray<Send, Receive>()
+    private identifiers: WeakMap<Channel<Send, Receive>, Id> = new WeakMap();
 
-    public manage(channel: Channel<Send, Receive>): Channel<Send, Receive> {
+    public manage(channel: Channel<Send, Receive>, identifier: Id): Channel<Send, Receive> {
         this.channels.push(channel);
+        this.identifiers.set(channel, identifier);
 
         channel.onDisconnect(() => {
             this.remove(channel)
         })
-
-        // channel.onLeave(() => { // need to implement onLeave first
-        //     this.left(channel)
-        // })
 
         return channel;
     }
@@ -29,6 +27,10 @@ export class ChannelManager<Send extends SenderSignature<Send>, Receive extends 
     public remove(channel: Channel<Send, Receive>) {
         this.channels.remove(channel);
         channel.destroy();
-        this.emit('left', channel)
+
+        // believe me this is okay (see Id = undefined at top as the generic default/if not default, top already fixes this problem);
+        const id = this.identifiers.get(channel) as Id;
+
+        this.emit('left', channel, id);
     }
 }

@@ -7,7 +7,7 @@
 - web/Game missing a game over screen, easy but I'm lazy
 
 # Definitely
-- refactor server/Game to make use of ChannelManager
+<!-- - refactor server/Game to make use of ChannelManager # delaying this bit me in the bottom lol -->
 
 # Maybe
 - 'error' channel:

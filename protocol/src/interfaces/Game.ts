@@ -5,6 +5,7 @@ export interface ServerSend {
 
 export interface ClientSend {
     input: (direction: Direction) => void,
+    leave: () => void
     getGameConfiguration: () => GameConfiguration
 }
 

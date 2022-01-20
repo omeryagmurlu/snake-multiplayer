@@ -17,13 +17,6 @@
     let canvas: HTMLCanvasElement;
     let clientHeight: number;
     let clientWidth: number;
-    let renderer: GameRenderer | undefined = undefined;
-
-    $: if (canvas && clientWidth && clientHeight) {
-        renderer = new GameRenderer(canvas, new Vector(clientWidth, clientHeight), connection.getId())
-    } else {
-        renderer = undefined;
-    }
 
     let gameControl: GameControls = GameControls.get($controls)
 
@@ -32,8 +25,6 @@
 
         channel.on('configure-game', conf => {
             gameConfig = conf
-            if (!renderer) throw new Error("no renderer");
-            renderer.updateGameConfiguration(gameConfig);
             // console.log(conf)
             // let str = `
             // size: ${conf.size.x}x${conf.size.y}
@@ -53,8 +44,8 @@
         })
         
         channel.on('tick', (b: BoardConfiguration) => {
-            if (!renderer) return;
-            renderer.updateBoardConfiguration(b);
+            if (!gameConfig) return;
+            const renderer = new GameRenderer(canvas, new Vector(clientWidth, clientHeight), gameConfig, b, connection.getId());
             renderer.render()
         })
             
@@ -64,6 +55,7 @@
 
     onDestroy(() => {
         gameControl.destroy()
+        channel.send('leave');
         channel.destroy()
     })
 </script>

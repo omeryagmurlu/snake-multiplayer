@@ -23,18 +23,16 @@ class ColorSquareTextures implements GameTextureSet {
 const ACCENT = '#9bbc0f';
 
 export class GameRenderer {
-    private cam: Camera;
     private ctx: CanvasRenderingContext2D;
     private textures: GameTextureSet;
-    private boardConfig!: BoardConfiguration; // 'not undefined' assertion here because: https://github.com/microsoft/TypeScript/issues/36931
-    private gameConfig!: GameConfiguration; // same here
-
     public static readonly DEFAULT_BLOCK_SIZE_IN_PIXEL = 18;
     public static readonly DEFAULT_FOCUS_RATIO = 1/3;
-
+    
     constructor(
         private canvas: HTMLCanvasElement,
         private canvasSize: Vector,
+        private gameConfig: GameConfiguration,
+        private boardConfig: BoardConfiguration,
         private myPlayerId: string,
         private blockSizeInPixel: number = GameRenderer.DEFAULT_BLOCK_SIZE_IN_PIXEL,
         private focusRatio: number = GameRenderer.DEFAULT_FOCUS_RATIO,
@@ -43,23 +41,7 @@ export class GameRenderer {
         if (!ctx) throw new Error('couldn\'t get canvas context')
         this.ctx = ctx;
             
-        this.textures = new ColorSquareTextures(this.blockSizeInPixel),
-        this.cam = new Camera(new Vector(canvasSize.x, canvasSize.y), ctx);
-    }
-
-    updateGameConfiguration(g: GameConfiguration) {
-        this.gameConfig = g;
-    }
-
-    updateBoardConfiguration(b: BoardConfiguration) {
-        this.boardConfig = b;
-    }
-
-    updateCanvas(canvasSize: Vector, canvas?: HTMLCanvasElement) {
-        this.canvas = canvas ?? this.canvas;
-        this.canvasSize = canvasSize;
-
-        this.cam = new Camera(new Vector(this.canvasSize.x, this.canvasSize.y), this.ctx);
+        this.textures = new ColorSquareTextures(this.blockSizeInPixel);
     }
 
     canRender() {
@@ -67,7 +49,10 @@ export class GameRenderer {
     }
 
     render = () => {
-        if (!this.canRender()) throw new Error('can\'t render, you are doing something wrong')
+        if (!this.canRender()) {
+            console.log(this.boardConfig, this.gameConfig, this.canvas, this.canvasSize)
+            throw new Error('can\'t render, you are doing something wrong')
+        }
 
         const myPlayer = this.getPlayerByID(this.myPlayerId);
         const focus = this.isActivePlayer(myPlayer.name)
@@ -119,10 +104,9 @@ export class GameRenderer {
         // if game fits within bounds, don't move camera at all, otherwise move camera.
         // camera position is set to players current location when the difference between active cam loc and player gets big
         // don't forget, you are moving the world, not the player, so the vector is inverted
-        this.cam.keepPointWithinAreaOfCameraWhileRespectingContextBoundaries(
-            new Vector(focus.x, focus.y), new Vector(this.canvasSize.x * this.focusRatio, this.canvasSize.y * this.focusRatio), new Vector(0, 0), this.gameSize()
-        )
-        this.cam.init()
+        const cam = new Camera(this.canvasSize, this.gameSize(), new Vector(0, 0), this.ctx);
+        cam.centered(focus);
+        cam.apply()
     }
 
     private gameSize() {

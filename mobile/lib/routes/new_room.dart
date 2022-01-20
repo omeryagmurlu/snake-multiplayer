@@ -32,6 +32,7 @@ class _NewRoomState extends State<NewRoom> {
 
   @override
   void dispose() {
+    debugPrint("newroom leave");
     _channel.destroy();
     super.dispose();
   }

@@ -70,6 +70,7 @@ class _RoomState extends State<Room> {
     }));
 
     _roomC.on('state', context, evfn((value, _) => setState(() {
+      debugPrint('stateeeee');
       _roomState = DetailedRoomState.fromJson(value);
     })));
 
@@ -86,6 +87,7 @@ class _RoomState extends State<Room> {
 
   @override
   void dispose() {
+    debugPrint("room leave");
     _roomMgmt.destroy();
     _roomC.send('leave');
     _roomC.destroy();
