@@ -23,14 +23,37 @@ class ControlProperties { // this is an interface
   });
 }
 
-abstract class GameControls {
-  // same reasoning with <insert filename here>
-  @protected
-  // ignore: prefer_function_declarations_over_variables
-  void Function(Direction) dirCb = (_) {};
+// I really don't like how Flutter forced me to make
+// this into a widget :L
+abstract class GameControls extends StatefulWidget {
+  final void Function(Direction) onDirection;
+  final Widget child;
+  const GameControls({
+    Key? key,
+    required this.onDirection,
+    required this.child,
+  }) : super(key: key);
 
-  onDirection(Function(Direction) cb) {
-    dirCb = cb;
+  @override
+  GameControlsState createState() => GameControlsState();
+}
+
+class GameControlsState<T extends GameControls> extends State<T> {
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  @override
+  void dispose() {
+    destroy();
+    super.dispose();
   }
 
   void init() {}
@@ -42,11 +65,30 @@ abstract class GameControls {
   void calibrate() {
     if (!getProperties().calibrable) throw Exception("this control can't be calibrated");
   }
+}
 
-  static GameControls get(ControlTypes c) {
-    switch (c) {
-      case ControlTypes.eSenseContinuous: return ESenseContinuous();
-      case ControlTypes.eSenseVelocity: return ESenseVelocity();
-    }
+class GameControlsStateBind {
+  GameControlsState? _customWidgetState;
+
+  void addState(GameControlsState state){
+    _customWidgetState = state;
+  }
+  
+  GameControlsState get bound {
+    if (_customWidgetState == null) throw Exception('state not bound');
+    return _customWidgetState!;    
   }
 }
+
+// class GameControlss {
+//   // same reasoning with <insert filename here>
+//   @protected
+//   // ignore: prefer_function_declarations_over_variables
+
+//   static GameControls get(ControlTypes c) {
+//     switch (c) {
+//       case ControlTypes.eSenseContinuous: return ESenseContinuous();
+//       case ControlTypes.eSenseVelocity: return ESenseVelocity();
+//     }
+//   }
+// }

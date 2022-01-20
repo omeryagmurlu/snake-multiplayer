@@ -13,14 +13,13 @@ enum ESenseState {
   notConnected
 }
 
-abstract class ESense extends GameControls {
+abstract class ESense {
   late String eSenseName;
   ESenseState state = ESenseState.notConnected;
   StreamSubscription? _sensor;
   StreamSubscription? _connEv;
   Timer? _conn;
 
-  @override
   init() {
     debugPrint('esense init');
     eSenseName = MyControls.eSenseName;
@@ -53,7 +52,6 @@ abstract class ESense extends GameControls {
     _connect();
   }
 
-  @override
   destroy() async {
     debugPrint('esense destroy');
     // hoes mad
@@ -68,7 +66,7 @@ abstract class ESense extends GameControls {
 
   _listen() {
     debugPrint('esense order listen');
-    ESenseManager().setSamplingRate(4);
+    ESenseManager().setSamplingRate(20);
     if (_sensor != null) {
       debugPrint('esense already listening, continue');
       return;
@@ -90,11 +88,22 @@ abstract class ESense extends GameControls {
   sensorHandler(SensorEvent event) {}
 }
 
-class ESenseContinuous extends ESense { // with esense accel and gyro mean exactly the opposite thing somehow?
+class ESenseContinuous extends GameControls {
+  const ESenseContinuous({
+    Key? key,
+    required void Function(Direction) onDirection,
+    required Widget child,
+  }) : super(key: key, onDirection: onDirection, child: child);
+
+  @override
+  _ESenseContinuousState createState() => _ESenseContinuousState();
+}
+
+class _ESenseContinuousState extends GameControlsState<ESenseContinuous> with ESense {
   bool isCalibrated = false;
   late int caly;
   late int calz;
-  
+
   @override
   sensorHandler(SensorEvent event) {
     final int y = event.accel![1];
@@ -110,13 +119,13 @@ class ESenseContinuous extends ESense { // with esense accel and gyro mean exact
     
     if (nory.abs() > MyControls.eSenseContinuousThreshold) {
       switch(nory.sign) {
-        case 1: dirCb(Direction.down); break;
-        case -1: dirCb(Direction.up); break;
+        case 1: widget.onDirection(Direction.down); break;
+        case -1: widget.onDirection(Direction.up); break;
       }
     } else if (norz.abs() > MyControls.eSenseContinuousThreshold) {
       switch(norz.sign) {
-        case 1: dirCb(Direction.right); break;
-        case -1: dirCb(Direction.left); break;
+        case 1: widget.onDirection(Direction.right); break;
+        case -1: widget.onDirection(Direction.left); break;
       }
     }
   }
@@ -131,22 +140,33 @@ class ESenseContinuous extends ESense { // with esense accel and gyro mean exact
   }
 }
 
-class ESenseVelocity extends ESense {
-    @override
-    sensorHandler(SensorEvent event) {
-      final int y = event.gyro![1];
-      final int z = event.gyro![2];
+class ESenseVelocity extends GameControls {
+  const ESenseVelocity({
+    Key? key,
+    required void Function(Direction) onDirection,
+    required Widget child,
+  }) : super(key: key, onDirection: onDirection, child: child);
 
-      if (z.abs() > MyControls.eSenseVelocityThreshold) {
-        switch(z.sign) {
-          case 1: dirCb(Direction.up); break;
-          case -1: dirCb(Direction.down); break;
-        }
-      } else if (z.abs() > MyControls.eSenseVelocityThreshold) {
-        switch(y.sign) {
-          case 1: dirCb(Direction.left); break;
-          case -1: dirCb(Direction.right); break;
-        }
+  @override
+  _ESenseVelocityState createState() => _ESenseVelocityState();
+}
+
+class _ESenseVelocityState extends GameControlsState<ESenseVelocity> with ESense {
+  @override
+  sensorHandler(SensorEvent event) {
+    final int y = event.gyro![1];
+    final int z = event.gyro![2];
+
+    if (z.abs() > MyControls.eSenseVelocityThreshold) {
+      switch(z.sign) {
+        case 1: widget.onDirection(Direction.up); break;
+        case -1: widget.onDirection(Direction.down); break;
+      }
+    } else if (z.abs() > MyControls.eSenseVelocityThreshold) {
+      switch(y.sign) {
+        case 1: widget.onDirection(Direction.left); break;
+        case -1: widget.onDirection(Direction.right); break;
       }
     }
+  }
 }

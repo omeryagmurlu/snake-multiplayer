@@ -24,7 +24,7 @@ class Camera {
       canvasSize.dx, canvasSize.dy
     ), Paint()..color = Colors.black);
 
-    final to = (-cam + canvasSize) / 2;
+    final to = (-cam + canvasSize / 2);
     canvas.translate(to.dx, to.dy);
   }
 

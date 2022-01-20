@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/components/window.dart';
 import 'package:mobile/external/protocol/connection.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
+import 'package:mobile/routes/game/controls/esense.dart';
 import 'package:mobile/routes/game/controls/index.dart';
 import 'package:mobile/routes/game/game_renderer.dart';
 import 'package:mobile/stores/settings.dart';
@@ -43,18 +44,11 @@ class _GameState extends State<Game> {
       });
     }));
 
-    _control = GameControls.get(MyControls.control);
-    _control.onDirection((dir) {
-      debugPrint(dir.toJson());
-      _channel.send('input', dir.toJson());
-    });
-    _control.init();
   }
 
   @override
   void dispose() {
     debugPrint("game leave");
-    _control.destroy();
     _channel.send('leave');
     _channel.destroy();
     super.dispose();
@@ -62,18 +56,29 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
     if (!canRender()) {
       debugPrint("can't render!");
-      return const Window(children: [], title: "loading");
+      child = const Window(children: [], title: "loading");
+    } else {
+      child = CustomPaint(
+        painter: GameRenderer(
+          myPlayerId: widget.connection.getId(),
+          boardConfig: boardConfig!,
+          gameConfig: gameConfig!
+        ),
+      );
     }
+    
+    switch (MyControls.control) {
+      case ControlTypes.eSenseContinuous: return ESenseContinuous(onDirection: _handleDirection, child: child);
+      case ControlTypes.eSenseVelocity: return ESenseVelocity(onDirection: _handleDirection, child: child);
+    }
+  }
 
-    return CustomPaint(
-      painter: GameRenderer(
-        myPlayerId: widget.connection.getId(),
-        boardConfig: boardConfig!,
-        gameConfig: gameConfig!
-      ),
-    );
+  _handleDirection(Direction dir) {
+    debugPrint(dir.toJson());
+    _channel.send('input', dir.toJson());
   }
 
   canRender() {
