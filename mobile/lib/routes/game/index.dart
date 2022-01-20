@@ -6,6 +6,7 @@ import 'package:mobile/external/protocol/connection.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
 import 'package:mobile/routes/game/controls/esense.dart';
 import 'package:mobile/routes/game/controls/index.dart';
+import 'package:mobile/routes/game/controls/swipe.dart';
 import 'package:mobile/routes/game/game_renderer.dart';
 import 'package:mobile/stores/settings.dart';
 import 'package:mobile/util.dart';
@@ -73,6 +74,7 @@ class _GameState extends State<Game> {
     switch (MyControls.control) {
       case ControlTypes.eSenseContinuous: return ESenseContinuous(onDirection: _handleDirection, child: child);
       case ControlTypes.eSenseVelocity: return ESenseVelocity(onDirection: _handleDirection, child: child);
+      case ControlTypes.swipe: return Swipe(onDirection: _handleDirection, child: child);
     }
   }
 

@@ -1,12 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
-
-import 'esense.dart';
 
 enum ControlTypes {
   eSenseContinuous, // uses the eSense.accel value (zeroth derivative)
   eSenseVelocity, // uses eSense.gyro value (first derivativ, velocity)
-  // swipe,
+  swipe,
   // sensor
 }
 
@@ -25,6 +23,7 @@ class ControlProperties { // this is an interface
 
 // I really don't like how Flutter forced me to make
 // this into a widget :L
+// Providing GestureDetector as a Widget is evil.
 abstract class GameControls extends StatefulWidget {
   final void Function(Direction) onDirection;
   final Widget child;

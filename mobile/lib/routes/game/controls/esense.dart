@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:esense_flutter/esense.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
 import 'package:mobile/stores/settings.dart';
 
