@@ -27,6 +27,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion flutter.compileSdkVersion
+    // compileSdkVersion 28 // for esense
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -46,6 +47,8 @@ android {
         applicationId "com.example.mobile"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
+        // minSdkVersion 23 // for esense
+        // targetSdkVersion 29 // for esense
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
