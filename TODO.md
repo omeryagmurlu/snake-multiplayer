@@ -1,10 +1,11 @@
 # Missing Functionality
-- flutter app
+- web/Game missing a game over screen, easy but I'm lazy
+- flutter foreground linear gradient
+- flutter styling
 
 # Bugfix
 - server/Room@ready should noop if inGame
-- server/Game overall needs leave mechanisms
-- web/Game missing a game over screen, easy but I'm lazy
+<!-- - server/Game overall needs better leave mechanisms -->
 
 # Definitely
 <!-- - refactor server/Game to make use of ChannelManager # delaying this bit me in the bottom lol -->
