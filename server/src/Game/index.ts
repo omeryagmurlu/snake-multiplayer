@@ -33,7 +33,7 @@ const DEFAULT_SIZE = new Vector(40, 40);
 const PAD = new Vector(10, 10);
 const INITIAL_SIZE = 2;
 const TIME = 240 * 1000;
-const TICKTIME = 750;
+const TICKTIME = 400;
 const PELLET_COUNT = 3;
 
 export class Game {

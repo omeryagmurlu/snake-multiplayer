@@ -18,6 +18,8 @@ export interface RoomPlayer {
     ready: boolean
 }
 
+const START_DELAY = 500; // I don't remember why this exists
+
 export class Room {
     private chanman = new ChannelManager<Ch[0], Ch[1]>()
 
@@ -119,7 +121,7 @@ export class Room {
                     this.playerChannels().broadcast('starting')
                     this.createGame()
                 }
-            }, 3000)
+            }, START_DELAY)
         }
     }
 
@@ -136,7 +138,8 @@ export class Room {
             name: this.name,
             max: this.playerCount,
             players: this.players.map(({ name, color, ready }) => ({ name, color, ready })),
-            ingame: this.inGame
+            ingame: this.inGame,
+            size: this.size
         }
     }
 

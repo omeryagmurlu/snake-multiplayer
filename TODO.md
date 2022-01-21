@@ -1,6 +1,6 @@
 # Missing Functionality
-- web/Game missing a game over screen, easy but I'm lazy
-- flutter foreground linear gradient
+<!-- - web/Game missing a game over screen, easy but I'm lazy -->
+- flutter missing a game over screen, easy do it later
 <!-- - flutter styling -->
 
 # Bugfix
@@ -18,4 +18,5 @@
     no deleteChannel method, I don't want to implement access control
 
 # Future
+- flutter foreground linear gradient
 - make webapp more optimized for phone (future cause flutter exists)

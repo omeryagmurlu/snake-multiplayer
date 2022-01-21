@@ -1,3 +1,5 @@
+import { Vector } from "./Game";
+
 export interface ServerSend {
     startingIn: (n: number) => void
     starting: () => void
@@ -28,5 +30,6 @@ export interface DetailedRoomState {
     name: string,
     max: number,
     players: Player[],
-    ingame: boolean
+    ingame: boolean,
+    size: Vector
 }
