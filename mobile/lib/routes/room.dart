@@ -1,12 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:mobile/components/color_picker.dart';
+import 'package:mobile/components/constrained_list.dart';
 import 'package:mobile/components/tab.dart';
 import 'package:mobile/components/window.dart';
 import 'package:mobile/external/protocol/connection.dart';
-import 'package:mobile/external/protocol/interfaces/game.dart';
 import 'package:mobile/external/protocol/interfaces/room.dart';
 import 'package:mobile/stores/router.dart';
 import 'package:mobile/util.dart';
@@ -110,14 +109,12 @@ class _RoomState extends State<Room> {
       Text(player.ready ? 'ready' : 'not ready')
     ]).expand((element) => element).toList();
 
-    return Window(
-      title: 'room ${rs.name}',
-      children: [
-        Text("id: ${rs.id}"),
+    final left = [
+      Text("id: ${rs.id}"),
         if (_registered == false) ...[
           const Text("register: "),
-          Tab4(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Tab4(child: Wrap(
+            runSpacing: 4,
             children: [
               TextField(
                 decoration: const InputDecoration(
@@ -127,20 +124,23 @@ class _RoomState extends State<Room> {
                   _name = value;
                 }),
               ),
-              Row(children: [
-                Text(
-                  "color: ",
-                  style: _color == null ? null : TextStyle(color: HexColor.fromHex(_color!))
-                ),
-                ColorPicker(onColor: (col) => setState(() {
-                  _color = col;
-                }))
-              ],),
-              TextButton(onPressed: (_color != null && _name != null) ? register : null, child: const Text('register'))
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "color: ",
+                    style: _color == null ? null : TextStyle(color: HexColor.fromHex(_color!))
+                  ),
+                  ColorPicker(onColor: (col) => setState(() {
+                    _color = col;
+                  }))
+                ],
+              ),
+              ElevatedButton(onPressed: (_color != null && _name != null) ? register : null, child: const Text('register'))
             ],
           ))
         ] else Row(children: [
-          Text("ready: "),
+          const Text("ready: "),
           Checkbox(value: _ready, onChanged: (bool? value) {
             setState(() {
               _ready = value!;
@@ -148,16 +148,31 @@ class _RoomState extends State<Room> {
             onReadyChange(value!);
           })
         ]),
-        Text("players: (${rs.current}/${rs.max})"),
-        Tab4(child: AlignedGridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          itemCount: playerList.length,
-          itemBuilder: (ctx, i) {
-            return playerList[i];
-          } 
-        ))
-      ],
-    );
+    ];
+
+    final right = [
+      Text("players: (${rs.current}/${rs.max})"),
+      Tab4(child: ContrainedList(constrain: 4, children: rs.players.map((player) => Row(
+          children: <List<dynamic>>[
+            [Row(children: [Text('█ ', style: TextStyle(color: HexColor.fromHex(player.color))), Text(player.name)]), 1],
+            [Text(player.ready ? 'ready' : 'not ready'), 1]
+          ].map((e) => Expanded(child: e[0], flex: e[1])).toList()
+        )).toList()
+      ))
+    ];
+
+    switch (MediaQuery.of(context).orientation) {
+      case Orientation.portrait:
+        return Window(
+          title: 'room ${rs.name}',
+          children: [...left, ...right],
+        );
+      case Orientation.landscape:
+        return Window2Pane(
+          title: 'room ${rs.name}',
+          left: left,
+          right: right,
+        );
+    }
   }
 }

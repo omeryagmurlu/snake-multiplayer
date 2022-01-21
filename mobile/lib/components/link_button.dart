@@ -5,10 +5,10 @@ class LinkButton extends StatelessWidget {
   const LinkButton({
     Key? key,
     required this.to,
-    required this.title,
+    required this.child,
   }) : super(key: key);
 
-  final String title;
+  final Widget child;
   final String to;
 
   @override
@@ -17,7 +17,7 @@ class LinkButton extends StatelessWidget {
       onPressed: () {
         MyRouter.router.navigateTo(context, to);
       },
-      child: Text(title),
+      child: child,
     );
   }
 }

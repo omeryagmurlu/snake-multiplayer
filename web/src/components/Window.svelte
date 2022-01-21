@@ -29,8 +29,7 @@ import { Link } from "svelte-routing";
 
 <style>
     section {
-        max-width: 75vw;
-        min-width: 270px;
+        padding: 0 2em;
         /* border: solid 1px red; */
     }
 

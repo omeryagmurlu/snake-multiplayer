@@ -36,7 +36,7 @@
     <Tab>
         <div class="grid">
             {#each rooms as room}
-            <div>{room.name}</div>
+            <div class="name">{room.name}</div>
             <div style="user-select: all;">{room.id}</div>
             <div>{room.current}/{room.max}</div>
             <div>
@@ -50,8 +50,12 @@
 <style>
     .grid {
         display: grid;
-        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        grid-template-columns: 4fr 3fr 2fr 3fr;
         align-items: baseline;
         justify-content: center;
+    }
+
+    .name {
+        word-break: break-all;
     }
 </style>

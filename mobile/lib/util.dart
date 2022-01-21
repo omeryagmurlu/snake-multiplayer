@@ -12,3 +12,8 @@ evfn(void Function(dynamic, Function) fn) => (ev, context) {
   final dynamic c = list.length > 1 ? list[1] : () {};
   fn(d, c);
 };
+
+extension TruncateableString on String {
+  String truncateTo(int maxLength) =>
+      (length <= maxLength) ? this : '${substring(0, maxLength)}...';
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/theme.dart';
 
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
@@ -13,8 +14,20 @@ extension HexColor on Color {
   String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
       '${alpha.toRadixString(16).padLeft(2, '0')}'
       '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${this.green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
+}
+
+List<List<T>> chunk<T> (List<T> l, int size) {
+  var len = l.length;
+  List<List<T>> chunks = [];
+
+  for(var i = 0; i< len; i+= size) {    
+      var end = (i+size<len)?i+size:len;
+      chunks.add(l.sublist(i,end));
+  }
+
+  return chunks;
 }
 
 class ColorPicker extends StatelessWidget {
@@ -41,20 +54,14 @@ class ColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100,
-      child: GridView.count(
-        shrinkWrap: true,
-        crossAxisCount: 4,
-        children: colors.map((e) => TextButton(
-          onPressed: () => onColor(e),
-          child: const Text(''),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(HexColor.fromHex(e)),
-            shape: MaterialStateProperty.all(const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)))
-          ),
+    return Column(
+      children: chunk(colors, 4)
+        .map((row) => Row(
+          children: row.map((e) => InkWell(
+            onTap: () => onColor(e),
+            child: Container(width: 1.5 * em, height: 1.5 * em, decoration: BoxDecoration(color: HexColor.fromHex(e))),
+          )).toList(),
         )).toList(),
-      ),
     );
   }
 }

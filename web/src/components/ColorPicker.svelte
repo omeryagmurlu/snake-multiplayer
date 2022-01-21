@@ -37,8 +37,8 @@
     }
 
     nav {
-        width: 16px;
-        height: 16px;
+        width: 1.25em;
+        height: 1.25em;
     }
 
     div.disabled > nav {

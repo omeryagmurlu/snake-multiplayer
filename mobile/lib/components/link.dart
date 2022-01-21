@@ -13,11 +13,13 @@ class Link extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
+    return InkWell(
+      onTap: () {
         MyRouter.router.navigateTo(context, to);
       },
-      child: Text(title),
+      child: Text(title, style: const TextStyle(
+        decoration: TextDecoration.underline,
+      )),
     );
   }
 }

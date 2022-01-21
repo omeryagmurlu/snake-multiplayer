@@ -9,6 +9,7 @@ import 'package:mobile/routes/room.dart';
 import 'package:mobile/routes/room_list.dart';
 import 'package:mobile/stores/router.dart';
 import 'package:fluro/fluro.dart';
+import 'package:mobile/theme.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 void main() => runApp(const MyApp());
@@ -50,9 +51,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       title: 'Multiplayer Snake',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
+      theme: theme(),
       initialRoute: '/',
       onGenerateRoute: MyRouter.router.generator,
     );

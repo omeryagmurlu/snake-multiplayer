@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:mobile/components/constrained_list.dart';
 import 'package:mobile/components/link.dart';
 import 'package:mobile/components/link_button.dart';
 import 'package:mobile/components/tab.dart';
@@ -51,26 +52,20 @@ class _RoomListState extends State<RoomList> {
 
   @override
   Widget build(BuildContext context) {
-    final l = _rooms.map((room) => [
-      Text(room.name),
-      Text(room.id),
-      Text('${room.current}/${room.max}'),
-      LinkButton(to: '/room/${room.id}', title: "join")
-    ]).expand((i) => i).toList(); // expand i => i means flatten... fucking dart
-    
     return Window(
       title: "available rooms",
       children: [
         const Link(to: '/newroom', title: 'new room'),
         const Text("rooms:"),
-        Tab4(child: AlignedGridView.count(
-          crossAxisCount: 4,
-          shrinkWrap: true,
-          itemCount: l.length,
-          itemBuilder: (ctx, i) {
-            return l[i];
-          } 
-        ))
+        Tab4(child: ContrainedList(constrain: 4, children: _rooms.map((room) => Row(
+            children: <List<dynamic>>[
+              [Text(room.name), 4],
+              [Text(room.id), 3],
+              [Text('${room.current}/${room.max}'), 2],
+              [LinkButton(to: '/room/${room.id}', child: const FittedBox(child: Text("join"))), 3],
+            ].map((e) => Expanded(child: e[0], flex: e[1])).toList()
+          )).toList())
+        )
       ]
     );
   }

@@ -40,7 +40,7 @@ input, button, select, textarea {
 	font-family: inherit;
 	font-size: inherit;
 
-	padding: 0.4em;
+	padding: 0.4em 0.8em;
 	margin: 0 0 0.5em 0;
 	box-sizing: border-box;
 	border: 1px solid #ccc;
@@ -83,6 +83,8 @@ input[type=number] {
 	--bg-color: #000;
 	--accent-color: #9bbc0f;
 	--accent-color-dark: #748d0b;
+	--disabled-bg: rgba(255, 255, 255, 0.12);
+	--disabled-fg: rgba(255, 255, 255, 0.38);
 	/* neave */
 	/* background-color: #9c9; */
 	
@@ -134,6 +136,11 @@ button {
 	border: none;
 	border-radius: 0;
 	cursor: pointer;
+}
+
+button:disabled {
+	background-color: var(--disabled-bg);
+	color: var(--disabled-fg);
 }
 
 a {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
 import 'package:mobile/routes/game/camera.dart';
 import 'package:mobile/routes/game/texture.dart';
+import 'package:mobile/theme.dart';
 
 Vector multiply(Vector v, int n) => Vector(x: (v.x * n), y: (v.y * n));
 Offset toOffset(Vector v) => Offset(v.x.toDouble(), v.y.toDouble());
@@ -13,7 +14,7 @@ class GameRenderer extends CustomPainter { // basically the render function, but
 
   static const defaultBlockSizeInPixel = 18;
   static const defaultFocusRatio = 1/3;
-  static const defaultBackGroundColor = Color(0xFF9bbc0f);
+  static const defaultBackGroundColor = Stylesheet.colorGreen;
 
   final String myPlayerId;
   final int blockSizeInPixel;
