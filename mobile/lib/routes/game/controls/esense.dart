@@ -78,7 +78,7 @@ abstract class ESense {
     if (ESenseManager().connected == true) {
       debugPrint("esense already connected");
       return true;
-    };
+    }
     return await ESenseManager().connect(eSenseName);
   }
 

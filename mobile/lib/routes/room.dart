@@ -131,7 +131,7 @@ class _RoomState extends State<Room> {
                   }))
                 ],
               ),
-              ElevatedButton(onPressed: (_color != null && _name != null) ? register : null, child: const Text('register'))
+              ElevatedButton(onPressed: (_color != null) ? register : null, child: const Text('register'))
             ],
           ))
         ] else Row(children: [

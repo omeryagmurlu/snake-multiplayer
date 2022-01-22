@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/components/color_picker.dart';
 import 'package:mobile/components/window.dart';
 import 'package:mobile/external/protocol/connection.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
@@ -6,6 +7,7 @@ import 'package:mobile/routes/game/controls/esense.dart';
 import 'package:mobile/routes/game/controls/swipe.dart';
 import 'package:mobile/routes/game/game_renderer.dart';
 import 'package:mobile/stores/settings.dart';
+import 'package:mobile/theme.dart';
 import 'package:mobile/util.dart';
 
 class Game extends StatefulWidget {
@@ -21,6 +23,7 @@ class _GameState extends State<Game> {
 
   BoardConfiguration? boardConfig;
   GameConfiguration? gameConfig;
+  int time = 0;
 
   @override
   void initState() {
@@ -38,6 +41,9 @@ class _GameState extends State<Game> {
     _channel.on('tick', context, evfn((conf, _) {
       setState(() {
         boardConfig = BoardConfiguration.fromJson(conf);
+        if (gameConfig != null) {
+          time = ((DateTime.now().millisecondsSinceEpoch - gameConfig!.startTime) / 1000).floor();
+        }
       });
     }));
 
@@ -53,17 +59,47 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
+
     Widget child;
     if (!canRender()) {
       debugPrint("can't render!");
       child = const Window(children: [], title: "loading");
     } else {
-      child = CustomPaint(
-        painter: GameRenderer(
-          myPlayerId: widget.connection.getId(),
-          boardConfig: boardConfig!,
-          gameConfig: gameConfig!
+      final mes = gameConfig!.players.where((p) => widget.connection.getId() == p.id);
+      final Player? me = mes.isNotEmpty ? mes.first : null;
+      final int remaining = gameConfig!.players.where((x) => !x.dead).length;
+
+      final endedC = gameConfig!.ended && me == null;
+      final winC = me != null && gameConfig!.ended && !me.dead;
+      final loseC = me != null && me.dead;
+      final modalShown = endedC || winC || loseC;
+
+      child = Stack(children: [
+        CustomPaint(
+          size: const Size(double.infinity, double.infinity),
+          painter: GameRenderer(
+            myPlayerId: widget.connection.getId(),
+            boardConfig: boardConfig!,
+            gameConfig: gameConfig!
+          ),
         ),
+        Scaffold(
+          backgroundColor: !modalShown ? const Color.fromARGB(0, 0, 0, 0) : const Color.fromARGB(128, 0, 0, 0),
+          body: Padding(
+            padding: const EdgeInsets.all(Stylesheet.windowPad),
+            child: Stack(children: [
+              if (me != null) ...[
+                Positioned(top: 0, left: 0, child: ColText(me.score.toString(), fg: HexColor.fromHex(me.color))),
+                if (loseC) const Modal(text: 'YOU LOSE'),
+                if (winC)  const Modal(text: 'YOU WIN')
+              ],
+              Positioned(bottom: 0, left: 0, child: ColText('$remaining pl.')),
+              // following is buggy but nvm
+              if (endedC) const Modal(text: 'GAME ENDED'),
+              Positioned(top: 0, right: 0, child: ColText('$time / ${gameConfig!.totalTime / 1000}'))
+            ]),
+          ),
+        )],
       );
     }
     
@@ -81,5 +117,27 @@ class _GameState extends State<Game> {
 
   canRender() {
     return boardConfig != null && gameConfig != null;
+  }
+}
+
+class ColText extends StatelessWidget {
+  final String text;
+  final Color? fg;
+
+  const ColText(this.text, { Key? key, this.fg }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text, style: TextStyle(backgroundColor: const Color.fromARGB(128, 0, 0, 0), color: fg));
+  }
+}
+
+class Modal extends StatelessWidget {
+  final String text;
+  const Modal({ Key? key, required this.text }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text(text));
   }
 }

@@ -76,7 +76,7 @@
     ></canvas>
     {#if d && d.me && gameConfig}
         <aside class="score" style:color={d.me.color}>{d.me.score}</aside>
-        <aside class="death" class:dead={d.me.dead}>YOU DIED</aside>
+        <aside class="death" class:dead={d.me.dead}>YOU LOSE</aside>
         <aside class="win" class:we={gameConfig.ended && !d.me.dead}>YOU WIN</aside>
     {/if}
     {#if !gameConfig}

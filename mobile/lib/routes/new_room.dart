@@ -44,9 +44,9 @@ class _NewRoomState extends State<NewRoom> {
   void create() async {
     if (!canCreate()) return;
     final String? id = await _channel.send('newRoom', {
-      'name': _name!,
-      'count': _count!,
-      'size': Vector(x: _sizeW!, y: _sizeH!)
+      'name': _name,
+      'count': _count,
+      'size': Vector(x: _sizeW, y: _sizeH)
     });
 
     inspect(id);
