@@ -19,7 +19,7 @@ class ColorSquare implements Texture {
   final int _size;
   ColorSquare(String colorStr, size): this.fromColor(HexColor.fromHex(colorStr), size);
 
-  ColorSquare.fromColor(Color color, size):
+  ColorSquare.fromColor(Color color, int size):
     _size = size,
     _paint = Paint()..color = color;
 
@@ -27,6 +27,18 @@ class ColorSquare implements Texture {
   draw(Vector v, Canvas c) {
     c.drawRect(
       Rect.fromLTWH(v.x.toDouble(), v.y.toDouble(), _size.toDouble(), _size.toDouble()),
+      _paint
+    );
+  }
+}
+
+class BeveledColorSquare extends ColorSquare {
+  BeveledColorSquare(String colorStr, size) : super(colorStr, size);
+  @override
+  draw(Vector v, Canvas c) {
+    c.drawRect(
+      Rect.fromLTWH(v.x.toDouble() + 1, v.y.toDouble() + 1, _size.toDouble() - 2, _size.toDouble() - 2),
+      // Rect.fromLTWH(v.x.toDouble(), v.y.toDouble(), _size.toDouble(), _size.toDouble()),
       _paint
     );
   }
@@ -46,6 +58,6 @@ class ColorSquareTextures implements GameTextureSet {
 
   @override
   Texture player({required Player player, required List<Pixel> positioning, required int positionIndex}) {
-    return ColorSquare(player.color, _size);
+    return BeveledColorSquare(player.color, _size);
   }
 }

@@ -18,10 +18,10 @@ class NewRoom extends StatefulWidget {
 class _NewRoomState extends State<NewRoom> {
   late Channel _channel;
 
-  String? _name;
-  int? _count;
-  int? _sizeW;
-  int? _sizeH;
+  String _name = getRandomString(5);
+  int _count = 2;
+  int _sizeW = 40;
+  int _sizeH = 40;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _NewRoomState extends State<NewRoom> {
   }
 
   bool canCreate() {
-    return _name != null && _count != null && _sizeH != null && _sizeW != null;
+    return true;
   }
 
   void create() async {
@@ -60,7 +60,8 @@ class _NewRoomState extends State<NewRoom> {
     return Window(
       title: 'new room',
       children: [
-        TextField(
+        TextFormField(
+          initialValue: _name,
           decoration: const InputDecoration(
             labelText: 'name',
           ),
@@ -69,28 +70,31 @@ class _NewRoomState extends State<NewRoom> {
           }),
           
         ),
-        TextField(
+        TextFormField(
+          initialValue: _count.toString(),
           decoration: const InputDecoration(
             labelText: 'player count',
           ),
           onChanged: (value) => setState(() {
-            _count = value == '' ? null : int.parse(value);
+            _count = value == '' ? 0 : int.parse(value);
           }),
           keyboardType: TextInputType.number,
         ),
         Row(
           children: [
             const Text("canvas size: "),
-            SizedBox(width: 50, child: TextField(
+            SizedBox(width: 50, child: TextFormField(
+              initialValue: _sizeW.toString(),
               onChanged: (value) => setState(() {
-                _sizeW = value == '' ? null : int.parse(value);
+                _sizeW = value == '' ? 0 : int.parse(value);
               }),
               keyboardType: TextInputType.number,
             )),
             const Text(" x "),
-            SizedBox(width: 50, child: TextField(
+            SizedBox(width: 50, child: TextFormField(
+              initialValue: _sizeH.toString(),
               onChanged: (value) => setState(() {
-                _sizeH = value == '' ? null : int.parse(value);
+                _sizeH = value == '' ? 0 : int.parse(value);
               }),
               keyboardType: TextInputType.number,
             )),

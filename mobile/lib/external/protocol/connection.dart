@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert' as convert;
-import 'dart:developer';
 import 'dart:math';
 
 import 'package:eventify/eventify.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 // My god I hate dart!

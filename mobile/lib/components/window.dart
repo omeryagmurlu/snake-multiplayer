@@ -1,6 +1,3 @@
-import 'dart:developer';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mobile/theme.dart';
 import 'package:mobile/util.dart';
@@ -18,7 +15,7 @@ class _WindowBase extends StatelessWidget {
     const pad = Stylesheet.windowPad;
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: pad),
+        padding: const EdgeInsets.symmetric(horizontal: pad),
         child: child,
       ),
     );

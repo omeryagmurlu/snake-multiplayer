@@ -14,6 +14,7 @@
 <Window title="controls">
     <div>selected: <span class="selected">{$controls.toLowerCase()}</span></div>
     <div>{DESC[$controls]}</div>
+    
     <div>available controls:</div>
     <button disabled={mobileCheck()} on:click={() => controls.set(ControlTypes.Keyboard)}>{ControlTypes.Keyboard.toLowerCase()}</button>
     <button disabled={!mobileCheck()} on:click={() => controls.set(ControlTypes.Swipe)}>{ControlTypes.Swipe.toLowerCase()}</button>

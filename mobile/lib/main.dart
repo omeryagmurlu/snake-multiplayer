@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    final Socket socket = io("http://192.168.0.48:3000", <String, dynamic>{
+    final Socket socket = io("http://oakleaf.duckdns.org:3000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
     });
@@ -54,24 +54,25 @@ class _MyAppState extends State<MyApp> {
       theme: theme(),
       initialRoute: '/',
       onGenerateRoute: MyRouter.router.generator,
+      debugShowCheckedModeBanner: false,
     );
   }
 
   routeUp() {
-    MyRouter.router.define('/', handler: Handler(handlerFunc: (context, _) => const Home()));
-    MyRouter.router.define('/controls', handler: Handler(handlerFunc: (context, _) => const Controls()));
+    MyRouter.router.define('/', handler: Handler(handlerFunc: (context, _) => const Home()), transitionType: TransitionType.none);
+    MyRouter.router.define('/controls', handler: Handler(handlerFunc: (context, _) => const Controls()), transitionType: TransitionType.none);
     MyRouter.router.define('/rooms', handler: Handler(handlerFunc: (context, _) {
       return Guard(against: _connection, childCreator: () => RoomList(connection: _connection!));
-    }));
+    }), transitionType: TransitionType.none);
     MyRouter.router.define('/room/:code', handler: Handler(handlerFunc: (context, params) {
       if (params["code"] == null) throw Exception("no code given");
       return Guard(against: _connection, childCreator: () => Room(code: params["code"]![0], connection: _connection!));
-    }));
+    }), transitionType: TransitionType.none);
     MyRouter.router.define('/newroom', handler: Handler(handlerFunc: (context, _) {
       return Guard(against: _connection, childCreator: () => NewRoom(connection: _connection!));
-    }));
+    }), transitionType: TransitionType.none);
     MyRouter.router.define('/game', handler: Handler(handlerFunc: (context, _) {
       return Guard(against: _connection, childCreator: () => Game(connection: _connection!));
-    }));
+    }), transitionType: TransitionType.none);
   }
 }

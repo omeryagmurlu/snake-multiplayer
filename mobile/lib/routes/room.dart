@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:mobile/components/color_picker.dart';
@@ -31,7 +30,7 @@ class _RoomState extends State<Room> {
 
   DetailedRoomState? _roomState;
   bool _registered = false;
-  String? _name;
+  String _name = getRandomString(5);
   String? _color;
   bool _ready = false;
   bool _gameStarting = false;
@@ -104,11 +103,6 @@ class _RoomState extends State<Room> {
     }
     final DetailedRoomState rs = _roomState!;
 
-    final List<Widget> playerList = rs.players.map((player) => [
-      Row(children: [Text('█ ', style: TextStyle(color: HexColor.fromHex(player.color))), Text(player.name)]),
-      Text(player.ready ? 'ready' : 'not ready')
-    ]).expand((element) => element).toList();
-
     final left = [
       Text("id: ${rs.id}"),
         if (_registered == false) ...[
@@ -116,7 +110,8 @@ class _RoomState extends State<Room> {
           Tab4(child: Wrap(
             runSpacing: 4,
             children: [
-              TextField(
+              TextFormField(
+                initialValue: _name,
                 decoration: const InputDecoration(
                   labelText: 'name',
                 ),

@@ -1,7 +1,7 @@
 import { Vector } from "protocol/dist/classes/Game";
 import type { BoardConfiguration, GameConfiguration, PelletType, Pixel, Player, PlayerPositioning, Vector as IVector } from "protocol/dist/interfaces/Game";
 import { Camera } from "./Camera";
-import { ColorSquare, Texture } from "./Texture";
+import { BeveledColorSquare, ColorSquare, Texture } from "./Texture";
 
 export interface GameTextureSet {
     solid: Texture,
@@ -17,7 +17,7 @@ class ColorSquareTextures implements GameTextureSet {
         this.solid = ColorSquare.colorSquare('rgba(0, 0, 0, 0.5)', size)
     }
     public pellet({ color }: PelletType) { return ColorSquare.colorSquare(color, this.size) }
-    public player({ color }: Player) { return ColorSquare.colorSquare(color, this.size) }
+    public player({ color }: Player) { return BeveledColorSquare.colorSquare(color, this.size) }
 }
 
 const ACCENT = '#9bbc0f';

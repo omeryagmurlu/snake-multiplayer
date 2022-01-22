@@ -1,19 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
 
-enum ControlTypes {
-  eSenseContinuous, // uses the eSense.accel value (zeroth derivative)
-  eSenseVelocity, // uses eSense.gyro value (first derivativ, velocity)
-  swipe,
-  // sensor
-}
-
-extension ParseToValue on ControlTypes {
-  String toValue() {
-    return toString().split('.').last.toUpperCase();
-  }
-}
-
 class ControlProperties { // this is an interface
   final bool calibrable;
   ControlProperties({
@@ -78,16 +65,3 @@ class GameControlsStateBind {
     return _customWidgetState!;    
   }
 }
-
-// class GameControlss {
-//   // same reasoning with <insert filename here>
-//   @protected
-//   // ignore: prefer_function_declarations_over_variables
-
-//   static GameControls get(ControlTypes c) {
-//     switch (c) {
-//       case ControlTypes.eSenseContinuous: return ESenseContinuous();
-//       case ControlTypes.eSenseVelocity: return ESenseVelocity();
-//     }
-//   }
-// }

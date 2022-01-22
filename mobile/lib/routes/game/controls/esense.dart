@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:esense_flutter/esense.dart';
 import 'package:flutter/widgets.dart';
@@ -22,7 +21,7 @@ abstract class ESense {
 
   init() {
     debugPrint('esense init');
-    eSenseName = MyControls.eSenseName;
+    eSenseName = MyControls.getESenseName();
 
     _connEv = ESenseManager().connectionEvents.listen((ConnectionEvent event) {
       debugPrint('esense connection event ${event.type}');
@@ -117,12 +116,12 @@ class _ESenseContinuousState extends GameControlsState<ESenseContinuous> with ES
     final nory = y - caly;
     final norz = z - calz;
     
-    if (nory.abs() > MyControls.eSenseContinuousThreshold) {
+    if (nory.abs() > MyControls.getESenseContinuousThreshold()) {
       switch(nory.sign) {
         case 1: widget.onDirection(Direction.down); break;
         case -1: widget.onDirection(Direction.up); break;
       }
-    } else if (norz.abs() > MyControls.eSenseContinuousThreshold) {
+    } else if (norz.abs() > MyControls.getESenseContinuousThreshold()) {
       switch(norz.sign) {
         case 1: widget.onDirection(Direction.right); break;
         case -1: widget.onDirection(Direction.left); break;
@@ -157,12 +156,12 @@ class _ESenseVelocityState extends GameControlsState<ESenseVelocity> with ESense
     final int y = event.gyro![1];
     final int z = event.gyro![2];
 
-    if (z.abs() > MyControls.eSenseVelocityThreshold) {
+    if (z.abs() > MyControls.getESenseVelocityThreshold()) {
       switch(z.sign) {
         case 1: widget.onDirection(Direction.up); break;
         case -1: widget.onDirection(Direction.down); break;
       }
-    } else if (z.abs() > MyControls.eSenseVelocityThreshold) {
+    } else if (z.abs() > MyControls.getESenseVelocityThreshold()) {
       switch(y.sign) {
         case 1: widget.onDirection(Direction.left); break;
         case -1: widget.onDirection(Direction.right); break;

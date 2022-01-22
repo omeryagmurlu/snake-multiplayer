@@ -45,7 +45,7 @@ class GameRenderer extends CustomPainter { // basically the render function, but
     final focus = isActivePlayer(myPlayer.name)
       ? boardConfig.players.where((pl) => pl.name == myPlayer.name).first.vectors[0]
       : Vector(x: 0, y: 0);
-    setupCamera(toOffset(mul(focus)), canvas, size); // not imp yet
+    setupCamera(toOffset(mul(focus)), canvas, size);
 
     canvas.drawRect(
       Rect.fromLTWH(0, 0, gameSize().dx, gameSize().dy),

@@ -7,6 +7,7 @@ class Stylesheet {
   static const colorGreen = Color(0xFF9bbc0f);
   static const windowMinSize = 270;
   static const windowPad = 2 * em;
+  static const gap = 0.25 * em;
 }
 
 theme() {

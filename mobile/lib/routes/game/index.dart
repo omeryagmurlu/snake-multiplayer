@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:mobile/components/window.dart';
 import 'package:mobile/external/protocol/connection.dart';
 import 'package:mobile/external/protocol/interfaces/game.dart';
 import 'package:mobile/routes/game/controls/esense.dart';
-import 'package:mobile/routes/game/controls/index.dart';
 import 'package:mobile/routes/game/controls/swipe.dart';
 import 'package:mobile/routes/game/game_renderer.dart';
 import 'package:mobile/stores/settings.dart';
@@ -21,7 +18,6 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   late Channel _channel;
-  late GameControls _control;
 
   BoardConfiguration? boardConfig;
   GameConfiguration? gameConfig;
@@ -71,7 +67,7 @@ class _GameState extends State<Game> {
       );
     }
     
-    switch (MyControls.control) {
+    switch (MyControls.getControl()) {
       case ControlTypes.eSenseContinuous: return ESenseContinuous(onDirection: _handleDirection, child: child);
       case ControlTypes.eSenseVelocity: return ESenseVelocity(onDirection: _handleDirection, child: child);
       case ControlTypes.swipe: return Swipe(onDirection: _handleDirection, child: child);
