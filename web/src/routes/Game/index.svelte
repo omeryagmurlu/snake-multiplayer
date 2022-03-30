@@ -83,7 +83,7 @@
         loading
     {:else if d}
         <aside class="remaining">{d.remaining} pl.</aside>
-        <!-- following is a bug but fuck that I don't care -->
+        <!-- following is a bug but I don't care -->
         <aside class="end" class:really={gameConfig.ended && !d.me}>GAME ENDED</aside>
         <aside class="time">{time} / {gameConfig.totalTime / 1000}</aside>
     {/if}

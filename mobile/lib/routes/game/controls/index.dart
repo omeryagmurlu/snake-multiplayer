@@ -11,6 +11,7 @@ class ControlProperties { // this is an interface
 // I really don't like how Flutter forced me to make
 // this into a widget :L
 // Providing GestureDetector as a Widget is evil.
+// I could use a controller but it's ugly
 abstract class GameControls extends StatefulWidget {
   final void Function(Direction) onDirection;
   final Widget child;

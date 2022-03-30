@@ -53,7 +53,6 @@ abstract class ESense {
 
   destroy() async {
     debugPrint('esense destroy');
-    // hoes mad
     _conn?.cancel();
     _sensor?.cancel();
     await _connEv?.cancel();

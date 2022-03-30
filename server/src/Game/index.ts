@@ -206,7 +206,6 @@ export class Game {
     loop = () => {
         let shouldSendGameConfig = false;
         if (this.ended) {
-            trace('wtf alread ended')
             return;
         }
 
